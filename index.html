@@ -1141,18 +1141,19 @@ async function callClaude(system,userMsg){
     openSettings();
     throw new Error('API 키를 먼저 설정해주세요. ⚙ 버튼을 눌러 입력하세요.');
   }
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
+  const res=await fetch('https://mba-hub-proxy.pawn13579.workers.dev',{
     method:'POST',
     headers:{
       'Content-Type':'application/json',
       'x-api-key': claudeApiKey,
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
     },
     body:JSON.stringify({model:getModel(),max_tokens:1500,system,messages:[{role:'user',content:userMsg}]})
   });
   const data=await res.json();
-  if(data.error)throw new Error(data.error.message);
+  if(!res.ok || data.error){
+    const msg = data.error?.message || JSON.stringify(data);
+    throw new Error(msg);
+  }
   return data.content[0].text;
 }
 
