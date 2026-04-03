@@ -1145,7 +1145,6 @@ async function callClaude(system,userMsg){
     method:'POST',
     headers:{
       'Content-Type':'application/json',
-      'x-api-key': claudeApiKey,
     },
     body:JSON.stringify({model:getModel(),max_tokens:1500,system,messages:[{role:'user',content:userMsg}]})
   });
