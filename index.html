@@ -379,6 +379,7 @@ button{cursor:pointer}
     <button class="google-login-btn" id="googleLoginBtn" onclick="handleGoogleLogin()">
       <span id="googleBtnLabel">🔗 Drive</span>
     </button>
+    <button class="icon-btn" title="API 키 설정" onclick="openSettings()">⚙</button>
     <button class="icon-btn" title="내보내기 (JSON)" onclick="exportData()">↓</button>
     <button class="icon-btn" title="불러오기 (JSON)" onclick="document.getElementById('impFile').click()">↑</button>
     <input type="file" id="impFile" accept=".json" style="display:none" onchange="importData(event)">
@@ -553,6 +554,9 @@ let db = { courses: [], lastSync: null };
 let activeCourseId = null, activeSessionId = null;
 let currentModel = 'sonnet';
 let editingCourse = null, selColor = COLORS[0];
+
+// API Key
+let claudeApiKey = localStorage.getItem('mba_claude_key') || '';
 
 // Google Drive
 let googleAccessToken = null;
@@ -1133,8 +1137,18 @@ function showInterim(text){
 // CLAUDE API
 // ═══════════════════════════════════════
 async function callClaude(system,userMsg){
+  if(!claudeApiKey){
+    openSettings();
+    throw new Error('API 키를 먼저 설정해주세요. ⚙ 버튼을 눌러 입력하세요.');
+  }
   const res=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',headers:{'Content-Type':'application/json'},
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key': claudeApiKey,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
     body:JSON.stringify({model:getModel(),max_tokens:1500,system,messages:[{role:'user',content:userMsg}]})
   });
   const data=await res.json();
@@ -1252,6 +1266,26 @@ function importData(e){
 
 // ═══════════════════════════════════════
 // UI HELPERS
+
+// ═══════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════
+function openSettings(){
+  document.getElementById('claudeKeyInput').value = claudeApiKey;
+  openModal('settingsModal');
+  setTimeout(()=>document.getElementById('claudeKeyInput').focus(),100);
+}
+function saveSettings(){
+  const key = document.getElementById('claudeKeyInput').value.trim();
+  if(!key){alert('API 키를 입력하세요.');return;}
+  claudeApiKey = key;
+  localStorage.setItem('mba_claude_key', key);
+  closeModal('settingsModal');
+  // Show confirmation
+  const btn = document.querySelector('.icon-btn[title="API 키 설정"]');
+  if(btn){btn.textContent='✓';setTimeout(()=>btn.textContent='⚙',2000);}
+}
+
 // ═══════════════════════════════════════
 function switchRTab(tab){
   ['ins','qa','exam','hw','kb'].forEach(t=>{
@@ -1273,8 +1307,32 @@ function init(){
   buildCPick(COLORS[0]);
   renderAll();
   if(db.courses.length&&!activeCourseId) selectCourse(db.courses[0].id);
+  // Prompt for API key if not set
+  if(!claudeApiKey){
+    setTimeout(()=>{
+      if(confirm('Claude API 키가 설정되지 않았습니다.\n지금 설정할까요?')) openSettings();
+    }, 800);
+  }
 }
 init();
 </script>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <div class="mhdr"><div class="mtitle">⚙ API 키 설정</div><button class="mclose" onclick="closeModal('settingsModal')">×</button></div>
+    <div class="mbody">
+      <div class="frow">
+        <div class="flabel">Anthropic API 키 (Claude)</div>
+        <input class="finput" id="claudeKeyInput" type="password" placeholder="sk-ant-api03-...">
+        <div style="font-size:10px;color:var(--tx3);margin-top:4px">console.anthropic.com 에서 발급. 이 기기 브라우저에만 저장됩니다.</div>
+      </div>
+    </div>
+    <div class="mfooter">
+      <button class="btn-cancel" onclick="closeModal('settingsModal')">취소</button>
+      <button class="btn-ok" onclick="saveSettings()">저장</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
