@@ -1141,7 +1141,7 @@ async function callClaude(system,userMsg){
     openSettings();
     throw new Error('API 키를 먼저 설정해주세요. ⚙ 버튼을 눌러 입력하세요.');
   }
-  const res=await fetch('https://mba-hub-proxy.pawn13579.workers.dev',{
+  const res=await fetch('/api/proxy',{
     method:'POST',
     headers:{
       'Content-Type':'application/json',
