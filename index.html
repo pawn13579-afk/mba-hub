@@ -1137,10 +1137,6 @@ function showInterim(text){
 // CLAUDE API
 // ═══════════════════════════════════════
 async function callClaude(system,userMsg){
-  if(!claudeApiKey){
-    openSettings();
-    throw new Error('API 키를 먼저 설정해주세요. ⚙ 버튼을 눌러 입력하세요.');
-  }
   const res=await fetch('/api/proxy',{
     method:'POST',
     headers:{
@@ -1307,12 +1303,7 @@ function init(){
   buildCPick(COLORS[0]);
   renderAll();
   if(db.courses.length&&!activeCourseId) selectCourse(db.courses[0].id);
-  // Prompt for API key if not set
-  if(!claudeApiKey){
-    setTimeout(()=>{
-      if(confirm('Claude API 키가 설정되지 않았습니다.\n지금 설정할까요?')) openSettings();
-    }, 800);
-  }
+
 }
 init();
 </script>
