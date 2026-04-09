@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBA Study Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07080c; --s1:#0d0e14; --s2:#13141c; --s3:#191b24; --s4:#1f2130;
+  --b:#252838; --b2:#2e3245;
+  --tx:#e2e5f5; --tx2:#7a82a8; --tx3:#454a6a;
+  --mono:'IBM Plex Mono',monospace; --sans:'Noto Sans KR',sans-serif;
+  --c0:#5b8df6; --c1:#10b981; --c2:#f59e0b; --c3:#a78bfa;
+  --c4:#ef4444; --c5:#06b6d4; --c6:#f472b6; --c7:#84cc16;
+  --ins:#10b981; --insb:rgba(16,185,129,.1);
+  --qa:#a78bfa;  --qab:rgba(167,139,250,.1);
+  --exam:#f59e0b;--examb:rgba(245,158,11,.1);
+  --hw:#06b6d4;  --hwb:rgba(6,182,212,.1);
+  --red:#ef4444;
+  --cur:#5b8df6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);display:flex;flex-direction:column;font-size:13px}
+
+/* \u2500\u2500 TOP BAR \u2500\u2500 */
+.topbar{display:flex;align-items:center;gap:8px;padding:0 14px;height:46px;background:var(--s1);border-bottom:1px solid var(--b);flex-shrink:0}
+.brand{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--tx2);letter-spacing:.06em;flex-shrink:0}
+.brand strong{color:var(--tx)}
+.vsep{width:1px;height:18px;background:var(--b);flex-shrink:0}
+.cur-course{font-size:11px;font-weight:500;color:var(--cur);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.cur-session{font-size:10px;color:var(--tx3);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+
+/* MODEL SELECTOR */
+.model-sel{
+  display:flex;background:var(--s2);border:1px solid var(--b);border-radius:6px;padding:2px;gap:2px;flex-shrink:0;
+}
+.mopt{padding:3px 9px;border-radius:4px;font-size:10px;cursor:pointer;border:none;background:transparent;color:var(--tx2);transition:all .2s;font-family:var(--sans);white-space:nowrap}
+.mopt.on{color:#fff}
+.mopt.sonnet.on{background:var(--c0)}
+.mopt.opus.on{background:var(--c3)}
+
+.topbar-right{display:flex;align-items:center;gap:6px;margin-left:auto}
+.rec-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:500;transition:all .2s;flex-shrink:0}
+.rec-btn.off{background:var(--s3);border:1px solid var(--b2);color:var(--tx2)}
+.rec-btn.off:hover{border-color:var(--cur);color:var(--cur)}
+.rec-btn.on{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:var(--red)}
+.rdot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.rec-btn.on .rdot{animation:blink .9s infinite}
+.timer-d{font-family:var(--mono);font-size:10px;color:var(--tx3)}
+.timer-d.on{color:var(--red)}
+.icon-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--b);background:transparent;color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s}
+.icon-btn:hover{border-color:var(--tx2);color:var(--tx)}
+.save-indicator{font-family:var(--mono);font-size:9px;color:var(--tx3);opacity:0;transition:opacity .4s}
+.save-indicator.show{opacity:1;color:var(--ins)}
+
+/* \u2500\u2500 BODY \u2500\u2500 */
+.body{display:flex;flex:1;overflow:hidden}
+
+/* \u2500\u2500 SIDEBAR \u2500\u2500 */
+.sidebar{width:200px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s1);border-right:1px solid var(--b);overflow:hidden}
+.sb-hdr{padding:10px 12px 7px;font-size:9px;font-weight:700;letter-spacing:.18em;color:var(--tx3);text-transform:uppercase;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.add-btn{width:18px;height:18px;border-radius:3px;border:1px solid var(--b2);background:transparent;color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s}
+.add-btn:hover{border-color:var(--cur);color:var(--cur)}
+.course-list{flex:1;overflow-y:auto;padding:5px}
+.ci{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:6px;cursor:pointer;transition:background .15s;margin-bottom:1px}
+.ci:hover{background:var(--s3)}
+.ci.active{background:var(--s3);box-shadow:inset 2px 0 0 var(--cur)}
+.ci-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ci-name{font-size:11px;font-weight:500;color:var(--tx2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci.active .ci-name{color:var(--tx)}
+.ci-cnt{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+.sb-footer{padding:8px 12px;border-top:1px solid var(--b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.sb-act{display:flex;align-items:center;gap:5px;padding:5px 7px;border-radius:5px;border:1px solid var(--b);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);font-size:10px;transition:all .2s}
+.sb-act:hover{border-color:var(--tx2);color:var(--tx)}
+
+/* \u2500\u2500 MIDDLE \u2500\u2500 */
+.middle{width:290px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s2);border-right:1px solid var(--b);overflow:hidden}
+
+/* SESSION LIST */
+.sl-wrap{flex-shrink:0;border-bottom:1px solid var(--b);display:flex;flex-direction:column;max-height:200px}
+.sl-hdr{padding:9px 12px 6px;font-size:9px;font-weight:700;letter-spacing:.18em;color:var(--tx3);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ns-btns{display:flex;gap:3px}
+.nsb{padding:3px 7px;border-radius:4px;border:1px solid var(--b2);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);font-size:10px;transition:all .2s}
+.nsb:hover{border-color:var(--cur);color:var(--cur)}
+.nsb.p{background:var(--cur);border-color:var(--cur);color:#fff}
+.nsb.p:hover{opacity:.85}
+.sl{overflow-y:auto;padding:5px}
+.si{padding:7px 9px;border-radius:5px;cursor:pointer;margin-bottom:2px;transition:background .15s;border-left:2px solid transparent}
+.si:hover{background:var(--s3)}
+.si.active{background:var(--s3);border-left-color:var(--cur)}
+.si-t{font-size:11px;font-weight:500;color:var(--tx2)}
+.si.active .si-t{color:var(--tx)}
+.si-m{display:flex;gap:5px;margin-top:2px;align-items:center}
+.si-d{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+.si-badge{font-size:9px;padding:1px 4px;border-radius:3px;font-weight:600}
+.sb-live{background:rgba(239,68,68,.15);color:var(--red)}
+.sb-text{background:var(--s4);color:var(--tx3)}
+
+/* TRANSCRIPT */
+.tx-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tx-hdr{padding:9px 12px 6px;font-size:9px;font-weight:700;letter-spacing:.18em;color:var(--tx3);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--b);flex-shrink:0}
+.live-pill{display:flex;align-items:center;gap:3px;font-size:9px;color:var(--red);opacity:0;transition:opacity .3s}
+.live-pill.show{opacity:1}
+.live-pill::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink .9s infinite}
+.wave-row{display:flex;gap:2px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--b);height:32px;flex-shrink:0}
+.wb{width:3px;border-radius:2px;background:var(--b2);transition:height .08s}
+.wb.on{background:var(--red)}
+.tx-scroll{flex:1;overflow-y:auto;padding:8px 12px}
+.seg{padding:4px 7px;border-radius:4px;font-size:11px;line-height:1.7;color:var(--tx3);border-left:2px solid transparent;margin-bottom:1px;transition:background .2s}
+.seg:hover{background:var(--s3)}
+.seg.cur{color:var(--tx);border-left-color:var(--cur);background:var(--s3)}
+.seg.interim{color:var(--tx3);font-style:italic}
+.seg-n{font-family:var(--mono);font-size:9px;color:var(--b2);margin-right:4px}
+.seg-ts{font-family:var(--mono);font-size:9px;color:var(--tx3);margin-right:4px}
+
+/* CONTROLS */
+.tx-ctrl{border-top:1px solid var(--b);padding:7px 10px;display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.ins-row{display:flex;gap:5px}
+.bins{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:6px;border-radius:5px;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:500;background:var(--insb);border:1px solid rgba(16,185,129,.25);color:var(--ins);transition:all .2s}
+.bins:hover:not(:disabled){background:rgba(16,185,129,.2)}
+.bins:disabled{opacity:.3;cursor:not-allowed}
+.bins-dot{width:5px;height:5px;border-radius:50%;background:var(--ins);flex-shrink:0}
+.bins.loading .bins-dot{animation:blink .6s infinite}
+.qa-row{display:flex;gap:5px}
+.qin{flex:1;background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:6px 9px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;transition:border-color .2s}
+.qin:focus{border-color:var(--cur)}
+.qin::placeholder{color:var(--tx3)}
+.bask{padding:6px 9px;border-radius:5px;border:none;cursor:pointer;font-family:var(--sans);font-size:10px;color:#fff;background:var(--cur);transition:opacity .2s;white-space:nowrap}
+.bask:hover{opacity:.85}
+.bask:disabled{opacity:.3;cursor:not-allowed}
+
+/* \u2500\u2500 RIGHT \u2500\u2500 */
+.right{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.rtabs{display:flex;border-bottom:1px solid var(--b);flex-shrink:0;background:var(--s1)}
+.rtab{flex:1;padding:9px 4px;font-size:10px;font-weight:500;text-align:center;cursor:pointer;border:none;background:transparent;color:var(--tx2);border-bottom:2px solid transparent;transition:all .2s;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:3px}
+.rtab.ai{color:var(--ins);border-bottom-color:var(--ins)}
+.rtab.aq{color:var(--qa);border-bottom-color:var(--qa)}
+.rtab.ae{color:var(--exam);border-bottom-color:var(--exam)}
+.rtab.ah{color:var(--hw);border-bottom-color:var(--hw)}
+.rtab.ak{color:var(--c5);border-bottom-color:var(--c5)}
+.rbadge{font-family:var(--mono);font-size:9px;padding:1px 4px;border-radius:7px;font-weight:600}
+.rib{background:var(--insb);color:var(--ins)}
+.rqb{background:var(--qab);color:var(--qa)}
+.reb{background:var(--examb);color:var(--exam)}
+.rhb{background:var(--hwb);color:var(--hw)}
+.rpane{display:none;flex:1;overflow-y:auto;padding:12px 16px;flex-direction:column;gap:10px}
+.rpane.show{display:flex}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--b);border-radius:9px;overflow:hidden;animation:slin .35s cubic-bezier(.22,1,.36,1)}
+.card.fresh{border-color:var(--cur)}
+@keyframes slin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card-hdr{display:flex;align-items:center;gap:7px;padding:7px 11px;background:var(--s2);border-bottom:1px solid var(--b)}
+.ct{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:7px;flex-shrink:0}
+.ct-key{background:var(--insb);color:var(--ins)}
+.ct-warn{background:var(--examb);color:var(--exam)}
+.ct-new{background:rgba(91,141,246,.12);color:var(--c0)}
+.ct-qa{background:var(--qab);color:var(--qa)}
+.ct-exam{background:var(--examb);color:var(--exam)}
+.ct-hw{background:var(--hwb);color:var(--hw)}
+.ct-kb{background:rgba(6,182,212,.12);color:var(--c5)}
+.card-title{font-size:11px;color:var(--tx);font-weight:500;flex:1}
+.card-ts{font-family:var(--mono);font-size:9px;color:var(--tx3);flex-shrink:0}
+.card-body{padding:11px;font-size:12px;line-height:1.85;color:var(--tx)}
+.card-body p{margin-bottom:5px}
+.card-body p:last-child{margin-bottom:0}
+.card-body strong{color:var(--ins);font-weight:500}
+
+/* GEN INDICATOR */
+.gen-card{background:var(--s1);border:1px solid var(--b);border-radius:9px;padding:12px;display:flex;align-items:center;gap:9px;animation:slin .35s cubic-bezier(.22,1,.36,1)}
+.gdots{display:flex;gap:3px}
+.gdots span{width:5px;height:5px;border-radius:50%;animation:bounce 1.2s infinite}
+.gdots span:nth-child(1){background:var(--ins);animation-delay:0s}
+.gdots span:nth-child(2){background:var(--qa);animation-delay:.2s}
+.gdots span:nth-child(3){background:var(--c0);animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.3}40%{transform:translateY(-5px);opacity:1}}
+.gtext{font-size:11px;color:var(--tx2)}
+
+/* KB PANE */
+.kb-controls{background:var(--s2);border:1px solid var(--b);border-radius:9px;padding:12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.kb-label{font-size:9px;color:var(--tx2);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.kb-upload-row{display:flex;gap:6px}
+.kb-upload-btn{flex:1;padding:7px;border-radius:5px;border:1px dashed var(--b2);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);font-size:11px;transition:all .2s;text-align:center}
+.kb-upload-btn:hover{border-color:var(--c5);color:var(--c5)}
+.kb-paste-input{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:7px 9px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;transition:border-color .2s;resize:none;width:100%}
+.kb-paste-input:focus{border-color:var(--c5)}
+.kb-paste-input::placeholder{color:var(--tx3)}
+.kb-add-btn{padding:6px 12px;border-radius:5px;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;color:#fff;background:var(--c5);transition:opacity .2s;align-self:flex-start}
+.kb-add-btn:hover{opacity:.85}
+.kb-src-title{font-size:9px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+
+/* KB SOURCE CARD */
+.kb-src{background:var(--s2);border:1px solid var(--b);border-radius:7px;overflow:hidden}
+.kb-src-hdr{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--s3);border-bottom:1px solid var(--b)}
+.kb-src-type{font-size:9px;padding:1px 5px;border-radius:5px;font-weight:700;background:rgba(6,182,212,.12);color:var(--c5)}
+.kb-src-name{font-size:11px;color:var(--tx2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kb-src-del{background:transparent;border:none;color:var(--tx3);cursor:pointer;font-size:12px;transition:color .2s;padding:0 2px}
+.kb-src-del:hover{color:var(--red)}
+.kb-src-body{padding:8px 10px;font-size:11px;line-height:1.6;color:var(--tx3);max-height:80px;overflow:hidden;position:relative}
+.kb-src-body::after{content:'';position:absolute;bottom:0;left:0;right:0;height:20px;background:linear-gradient(transparent,var(--s2))}
+
+/* EXAM/HW CONTROLS */
+.mode-ctrl{background:var(--s2);border:1px solid var(--b);border-radius:9px;padding:12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.mc-label{font-size:9px;color:var(--tx2);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.mc-desc{font-size:11px;color:var(--tx3);line-height:1.6}
+.mc-sel{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:6px 8px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;cursor:pointer;width:100%}
+.mc-tin{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:6px 8px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;resize:none;width:100%}
+.mc-tin::placeholder{color:var(--tx3)}
+.mc-btn{padding:7px 12px;border-radius:5px;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:500;color:#fff;transition:opacity .2s;align-self:flex-start}
+.mc-btn:hover{opacity:.85}
+.mc-btn:disabled{opacity:.3;cursor:not-allowed}
+.mc-btn.exam{background:var(--exam)}
+.mc-btn.hw{background:var(--hw)}
+
+/* EMPTY */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--tx3);text-align:center;padding:30px}
+.ei{font-size:28px;opacity:.2}
+.et{font-size:11px;line-height:1.7;max-width:180px}
+
+/* MODALS */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--s2);border:1px solid var(--b2);border-radius:11px;width:420px;max-width:94vw;overflow:hidden;animation:slin .3s cubic-bezier(.22,1,.36,1)}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--b)}
+.mtitle{font-size:13px;font-weight:600;color:var(--tx)}
+.mclose{background:transparent;border:none;color:var(--tx2);cursor:pointer;font-size:18px;line-height:1;padding:0;transition:color .2s}
+.mclose:hover{color:var(--tx)}
+.mbody{padding:16px;display:flex;flex-direction:column;gap:12px}
+.frow{display:flex;flex-direction:column;gap:5px}
+.flabel{font-size:10px;color:var(--tx2);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.finput{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:8px 10px;font-size:12px;font-family:var(--sans);color:var(--tx);outline:none;transition:border-color .2s}
+.finput:focus{border-color:var(--cur)}
+.finput::placeholder{color:var(--tx3)}
+.ftarea{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:8px 10px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;transition:border-color .2s;resize:vertical;min-height:90px}
+.ftarea:focus{border-color:var(--cur)}
+.ftarea::placeholder{color:var(--tx3)}
+.cpick{display:flex;gap:7px;flex-wrap:wrap}
+.cpdot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.cpdot.on{border-color:#fff;transform:scale(1.15)}
+.mfooter{padding:10px 16px;border-top:1px solid var(--b);display:flex;justify-content:flex-end;gap:7px}
+.btn-cancel{padding:6px 12px;border-radius:5px;border:1px solid var(--b2);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);font-size:11px;transition:all .2s}
+.btn-cancel:hover{border-color:var(--tx2);color:var(--tx)}
+.btn-ok{padding:6px 14px;border-radius:5px;border:none;background:var(--cur);color:#fff;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:500;transition:opacity .2s}
+.btn-ok:hover{opacity:.85}
+.paste-area{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:8px 10px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;resize:vertical;min-height:120px;width:100%}
+.paste-area:focus{border-color:var(--cur)}
+.paste-area::placeholder{color:var(--tx3)}
+
+/* FOOTER */
+.footer{display:flex;align-items:center;gap:8px;padding:5px 14px;background:var(--s1);border-top:1px solid var(--b);flex-shrink:0}
+.fstat{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+.fstat em{color:var(--tx2);font-style:normal}
+.phase-badge{font-size:8px;padding:2px 6px;border-radius:8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:var(--exam);font-family:var(--mono)}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">MBA<strong>\u00b7HUB</strong></div>
+  <div class="vsep"></div>
+  <div class="cur-course" id="topCourse">\uacfc\ubaa9 \uc120\ud0dd</div>
+  <div class="cur-session" id="topSession"></div>
+  <div class="vsep"></div>
+  <!-- MODEL SELECTOR -->
+  <div class="model-sel">
+    <button class="mopt sonnet on" id="mSonnet" onclick="setModel('sonnet')">Sonnet 4.6</button>
+    <button class="mopt opus" id="mOpus" onclick="setModel('opus')">Opus 4.6</button>
+  </div>
+  <div class="topbar-right">
+    <button class="rec-btn off" id="recBtn" onclick="toggleRec()">
+      <div class="rdot"></div><span id="recLabel">\ub179\uc74c \uc2dc\uc791</span>
+    </button>
+    <div class="timer-d" id="timerD">00:00</div>
+    <div class="vsep"></div>
+    <div class="save-indicator" id="saveInd">\u2713 \uc800\uc7a5\ub428</div>
+    <button class="icon-btn" title="\ub0b4\ubcf4\ub0b4\uae30" onclick="exportData()">\u2193</button>
+    <button class="icon-btn" title="\ubd88\ub7ec\uc624\uae30" onclick="document.getElementById('impFile').click()">\u2191</button>
+    <input type="file" id="impFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-hdr">\uacfc\ubaa9 <button class="add-btn" onclick="openAddCourse()">+</button></div>
+    <div class="course-list" id="courseList"></div>
+    <div class="sb-footer">
+      <button class="sb-act" onclick="exportData()">\ud83d\udce4 \ub0b4\ubcf4\ub0b4\uae30</button>
+      <button class="sb-act" onclick="document.getElementById('impFile').click()">\ud83d\udce5 \ubcf5\uc6d0</button>
+    </div>
+  </div>
+
+  <!-- MIDDLE -->
+  <div class="middle">
+    <div class="sl-wrap">
+      <div class="sl-hdr">\uc138\uc158
+        <div class="ns-btns">
+          <button class="nsb" onclick="openNewText()">+ \ud14d\uc2a4\ud2b8</button>
+          <button class="nsb p" onclick="newLive()">+ \ub179\uc74c</button>
+        </div>
+      </div>
+      <div class="sl" id="sessionList"></div>
+    </div>
+    <div class="tx-wrap">
+      <div class="tx-hdr">\ud2b8\ub79c\uc2a4\ud06c\ub9bd\ud2b8 <div class="live-pill" id="livePill">LIVE</div></div>
+      <div class="wave-row" id="waveRow"></div>
+      <div class="tx-scroll" id="txScroll">
+        <div class="empty" id="txEmpty"><div class="ei">\ud83d\udcdd</div><div class="et">\uc138\uc158\uc744 \uc120\ud0dd\ud558\uac70\ub098 \uc0c8 \ub179\uc74c\uc744 \uc2dc\uc791\ud558\uc138\uc694</div></div>
+      </div>
+      <div class="tx-ctrl">
+        <div class="ins-row">
+          <button class="bins" id="binsBtn" onclick="requestInsight()" disabled>
+            <div class="bins-dot"></div><span id="binsLbl">\ud83d\udca1 \uc778\uc0ac\uc774\ud2b8 \uc694\uccad</span>
+          </button>
+        </div>
+        <div class="qa-row">
+          <input class="qin" id="qin" placeholder="\uc9c8\ubb38 \uc785\ub825 \ud6c4 Enter\u2026" onkeydown="if(event.key==='Enter')askQ()">
+          <button class="bask" id="baskBtn" onclick="askQ()" disabled>\uc9c8\ubb38</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="rtabs">
+      <button class="rtab ai" id="rt-ins"  onclick="switchRTab('ins')">\ud83d\udca1 \uc778\uc0ac\uc774\ud2b8 <span class="rbadge rib" id="cntIns">0</span></button>
+      <button class="rtab"    id="rt-qa"   onclick="switchRTab('qa')">\ud83d\ude4b Q&A <span class="rbadge rqb" id="cntQa">0</span></button>
+      <button class="rtab"    id="rt-exam" onclick="switchRTab('exam')">\ud83d\udcdd \uc2dc\ud5d8\uc900\ube44</button>
+      <button class="rtab"    id="rt-hw"   onclick="switchRTab('hw')">\ud83d\udccb \uacfc\uc81c\uc900\ube44</button>
+      <button class="rtab"    id="rt-kb"   onclick="switchRTab('kb')">\ud83d\uddc2 KB</button>
+    </div>
+
+    <div class="rpane show" id="pane-ins">
+      <div class="empty" id="insEmpty"><div class="ei">\ud83d\udca1</div><div class="et">\uc778\uc0ac\uc774\ud2b8 \uc694\uccad \ubc84\ud2bc\uc744 \ub204\ub974\uba74 \ubd84\uc11d \uacb0\uacfc\uac00 \uc790\ub3d9 \uc800\uc7a5\ub429\ub2c8\ub2e4</div></div>
+    </div>
+    <div class="rpane" id="pane-qa">
+      <div class="empty" id="qaEmpty"><div class="ei">\ud83d\ude4b</div><div class="et">\uc9c8\ubb38\uc744 \uc785\ub825\ud558\uba74 \ub2f5\ubcc0\uc774 \uc790\ub3d9 \uc800\uc7a5\ub429\ub2c8\ub2e4</div></div>
+    </div>
+
+    <!-- EXAM -->
+    <div class="rpane" id="pane-exam">
+      <div class="mode-ctrl">
+        <div class="mc-label">\ud83d\udcdd \uc2dc\ud5d8 \uc900\ube44</div>
+        <div class="mc-desc">\ud604\uc7ac \uc138\uc158 \ub610\ub294 \uacfc\ubaa9 \uc804\uccb4\ub97c \uae30\ubc18\uc73c\ub85c \uc608\uc0c1 \ubb38\uc81c\ub97c \uc0dd\uc131\ud569\ub2c8\ub2e4.</div>
+        <select class="mc-sel" id="examScope"><option value="session">\ud604\uc7ac \uc138\uc158\ub9cc</option><option value="course">\uc774 \uacfc\ubaa9 \uc804\uccb4 \uc138\uc158</option></select>
+        <textarea class="mc-tin" id="examHint" placeholder="\ucd94\uac00 \ud78c\ud2b8 (\uc120\ud0dd): \uc608) 3\uc7a5 \uc911\uc2ec\uc73c\ub85c\u2026" rows="2"></textarea>
+        <button class="mc-btn exam" id="examBtn" onclick="runExam()" disabled>\uc608\uc0c1 \ubb38\uc81c \uc0dd\uc131</button>
+      </div>
+      <div id="examResults"></div>
+    </div>
+
+    <!-- HW -->
+    <div class="rpane" id="pane-hw">
+      <div class="mode-ctrl">
+        <div class="mc-label">\ud83d\udccb \uacfc\uc81c \uc900\ube44</div>
+        <div class="mc-desc">\uacfc\uc81c \uc8fc\uc81c\ub97c \uc785\ub825\ud558\uba74 \uac15\uc758 \ub0b4\uc6a9 \uae30\ubc18 \uc544\uc774\ub514\uc5b4\ub97c \uc0dd\uc131\ud569\ub2c8\ub2e4.</div>
+        <textarea class="mc-tin" id="hwTopic" placeholder="\uacfc\uc81c \uc8fc\uc81c \ub610\ub294 \uc9c0\uc2dc\uc0ac\ud56d\u2026" rows="3"></textarea>
+        <select class="mc-sel" id="hwScope"><option value="session">\ud604\uc7ac \uc138\uc158\ub9cc</option><option value="course">\uc774 \uacfc\ubaa9 \uc804\uccb4 \uc138\uc158</option></select>
+        <button class="mc-btn hw" id="hwBtn" onclick="runHw()" disabled>\uc544\uc774\ub514\uc5b4 \uc0dd\uc131</button>
+      </div>
+      <div id="hwResults"></div>
+    </div>
+
+    <!-- KB -->
+    <div class="rpane" id="pane-kb">
+      <div class="kb-controls">
+        <div class="kb-label">\ud83d\uddc2 Knowledge Base</div>
+        <div class="kb-upload-row">
+          <button class="kb-upload-btn" onclick="document.getElementById('kbFile').click()">\ud83d\udcc4 \ud30c\uc77c \uc5c5\ub85c\ub4dc (PDF/TXT)</button>
+        </div>
+        <input type="file" id="kbFile" accept=".pdf,.txt,.md" style="display:none" onchange="uploadKBFile(event)">
+        <textarea class="kb-paste-input" id="kbPaste" placeholder="\ud14d\uc2a4\ud2b8 \uc9c1\uc811 \uc785\ub825 \ub610\ub294 \ubd99\uc5ec\ub123\uae30 (\uac15\uc758\uc790\ub8cc, \uc6d0\uc6b0 \uacf5\uc720 \ub0b4\uc6a9 \ub4f1)\u2026" rows="3"></textarea>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input class="kb-paste-input" id="kbSrcName" placeholder="\uc18c\uc2a4 \uc774\ub984 (\uc608: 3\uac15 PPT)" style="flex:1;resize:none">
+          <button class="kb-add-btn" onclick="addKBText()">\ucd94\uac00</button>
+        </div>
+      </div>
+      <div class="kb-src-title" id="kbSrcTitle"></div>
+      <div id="kbSrcList"></div>
+      <div class="empty" id="kbEmpty" style="flex:none;padding:20px"><div class="ei" style="font-size:22px">\ud83d\uddc2</div><div class="et">\ud30c\uc77c \uc5c5\ub85c\ub4dc \ub610\ub294 \ud14d\uc2a4\ud2b8\ub97c \ucd94\uac00\ud558\uba74 \uc774 \uacfc\ubaa9\uc758 AI \ub2f5\ubcc0\uc5d0 \uc790\ub3d9\uc73c\ub85c \ubc18\uc601\ub429\ub2c8\ub2e4</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="fstat">\uacfc\ubaa9 <em id="fC">0</em> \u00b7 \uc138\uc158 <em id="fS">0</em> \u00b7 \uc778\uc0ac\uc774\ud2b8 <em id="fI">0</em> \u00b7 Q&A <em id="fQ">0</em></div>
+  <div class="phase-badge" style="margin-left:auto">Phase 1 \u00b7 localStorage</div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="addCourseModal">
+  <div class="modal">
+    <div class="mhdr"><div class="mtitle" id="acTitle">\uc0c8 \uacfc\ubaa9 \ucd94\uac00</div><button class="mclose" onclick="closeModal('addCourseModal')">\u00d7</button></div>
+    <div class="mbody">
+      <div class="frow"><div class="flabel">\uacfc\ubaa9\uba85</div><input class="finput" id="cName" placeholder="\uc608: KMB 520 \ub9c8\ucf00\ud305\uad00\ub9ac"></div>
+      <div class="frow"><div class="flabel">\uc0c9\uc0c1</div><div class="cpick" id="cpick"></div></div>
+      <div class="frow"><div class="flabel">\ucd08\uae30 Knowledge Base</div><textarea class="ftarea" id="cKB" placeholder="\uac15\uc758 \ud575\uc2ec \uac1c\ub150, \uad50\uc218\ub2d8 \uc2a4\ud0c0\uc77c, \uacfc\uc81c \ubd84\uc11d \ub0b4\uc6a9 \ub4f1\u2026"></textarea></div>
+    </div>
+    <div class="mfooter"><button class="btn-cancel" onclick="closeModal('addCourseModal')">\ucde8\uc18c</button><button class="btn-ok" onclick="saveCourse()">\uc800\uc7a5</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="textSessModal">
+  <div class="modal">
+    <div class="mhdr"><div class="mtitle">\ud14d\uc2a4\ud2b8 \uc138\uc158 \ucd94\uac00</div><button class="mclose" onclick="closeModal('textSessModal')">\u00d7</button></div>
+    <div class="mbody">
+      <div class="frow"><div class="flabel">\uc138\uc158 \uc81c\ubaa9</div><input class="finput" id="tsTitle" placeholder="\uc608: 3\uac15 \uc18c\ube44\uc790\ud589\ub3d9\ub860"></div>
+      <div class="frow"><div class="flabel">\ub0a0\uc9dc</div><input class="finput" type="date" id="tsDate"></div>
+      <div class="frow"><div class="flabel">\uac15\uc758 \ud14d\uc2a4\ud2b8</div><textarea class="paste-area" id="tsContent" placeholder="NotebookLM \ubcc0\ud658 \ud14d\uc2a4\ud2b8, \uac15\uc758 \ub178\ud2b8, \ub179\ucde8\ub85d \ub4f1\uc744 \ubd99\uc5ec\ub123\uc73c\uc138\uc694\u2026"></textarea></div>
+    </div>
+    <div class="mfooter"><button class="btn-cancel" onclick="closeModal('textSessModal')">\ucde8\uc18c</button><button class="btn-ok" onclick="saveTextSess()">\uc800\uc7a5</button></div>
+  </div>
+</div>
+
+<script>
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// CONSTANTS
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+const COLORS = ['#5b8df6','#10b981','#f59e0b','#a78bfa','#ef4444','#06b6d4','#f472b6','#84cc16'];
+const MODELS = { sonnet:'claude-sonnet-4-6', opus:'claude-opus-4-6' };
+const KMB520_KB = `## KMB 520 \ub9c8\ucf00\ud305\uad00\ub9ac \u2014 \uae40\uc7ac\ud658 \uad50\uc218 (\uace0\ub824\ub300 KMBA)
+1\uac15: \ub9c8\ucf00\ud305=\uad50\ud658\uc2dc\uc2a4\ud15c, \ud380\ub354\uba58\ud138 vs \ub514\ud14c\uc77c, \ub300\uccb4\uc7ac\ub85c \uac00\uce58 \uc5ed\uc0b0, Core Competence=\uc120\uc21c\ud658 \uad6c\uc870
+2\uac15: 3C(Customer=\uad6c\ub9e4\uc790\u2260\ucd5c\uc885\uc18c\ube44\uc790), Unsought demand, Value Proposition \ud55c \ubb38\uc7a5, "\ub2f9\uc5f0\ud55c \uac83\uc5d0 \uc9c8\ubb38"
+3\uac15: SEO\u2192GEO \uc804\ud658, AI\ud0d0\uc0c9=\uc2a4\ud399 \uae30\ubc18 \ucd94\ucc9c\u2191, \ubc31\uc5d4\ub4dc \ud45c\uc900\ud654\uac00 \uacbd\uc7c1\uc6b0\uc704
+4\uac15: "\ubcc0\ud558\uc9c0 \uc54a\ub294 \uac83\uc73c\ub85c \ubcc0\ud560 \uac83\uc744 \uc608\uce21", \uc9c8\ubb38\uacfc \ub2f5 \ub3d9\uc2dc \uc124\uacc4, OSMU
+\ucf54\uc2a4\ub9e5\uc2a4 \ud300 \uacfc\uc81c: Position(K-\ubdf0\ud2f0 ODM 1\uc704, ~2\uc870), Advantage(\ud574\uc7903\ucd95-\ub370\uc774\ud130\u00b7\ud2b9\ud5c8\u00b7\ud30c\ud2b8\ub108\uc2ed), Competition(\uc2e4\ub9ac\ucf58\ud22c \uc704\ud611, \ube44\ub300\uce6d \uad6c\uc870), AI Strategy(D\ud504\ub9ac\ubbf8\uc5c44\ucc28\uc6d0\u00b7\uc804\ub7b54\ucd95\u00b7Global Beauty OS)
+\ud329\ud2b8: \uc870\uc120\ubbf8\ub140\u2192\ud55c\uad6d\ucf5c\ub9c8, 80%\u219230%\ud0c0\uaca9, \ud2b9\ud5c83324\uac74, Anua\u00d7COSMAX Coincelle=RTB`;
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// STATE
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+let db = { courses: [] };
+let activeCourseId = null, activeSessionId = null;
+let currentModel = 'sonnet';
+let editingCourse = null, selColor = COLORS[0];
+let saveTimeout = null;
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// PERSISTENCE
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+function save() {
+  try {
+    localStorage.setItem('mba_hub_v2', JSON.stringify(db));
+    flashSave();
+  } catch(e) { console.warn('save error', e); }
+}
+
+function flashSave() {
+  const el = document.getElementById('saveInd');
+  el.classList.add('show');
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem('mba_hub_v2');
+    if (raw) db = JSON.parse(raw);
+    if (db.courses.length === 0) seedKMB520();
+  } catch(e) {
+    db = { courses: [] };
+    seedKMB520();
+  }
+}
+
+function seedKMB520() {
+  db.courses.push({
+    id: uid(), name: 'KMB 520 \ub9c8\ucf00\ud305\uad00\ub9ac', color: '#5b8df6',
+    kbSources: [{ id: uid(), name: 'KMB520 \uae30\ubcf8 \ub9e5\ub77d', type: 'text', content: KMB520_KB, ts: nowStr() }],
+    sessions: []
+  });
+  save();
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// HELPERS
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const nowStr = () => new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+const todayStr = () => new Date().toISOString().slice(0,10);
+const getCourse = id => db.courses.find(c => c.id === id);
+const getSession = (cid, sid) => { const c = getCourse(cid); return c ? c.sessions.find(s => s.id === sid) : null; };
+const activeCourse = () => getCourse(activeCourseId);
+const activeSession = () => getSession(activeCourseId, activeSessionId);
+
+function buildKBContext(course) {
+  if (!course || !course.kbSources || course.kbSources.length === 0) return '';
+  return '\n\n## \uacfc\ubaa9 Knowledge Base\n' + course.kbSources.map(s => `[${s.name}]\n${s.content}`).join('\n\n');
+}
+
+function buildSys(extra = '') {
+  const c = activeCourse(), s = activeSession();
+  const kb = buildKBContext(c);
+  return `\ub2f9\uc2e0\uc740 \uace0\ub824\ub300 KMBA \ud559\uc0dd(\uc784\uacbd\ud6c8)\uc758 \ud559\uc2b5 \uc5b4\uc2dc\uc2a4\ud134\ud2b8\uc785\ub2c8\ub2e4.
+\uacfc\ubaa9: ${c ? c.name : '\ubbf8\uc120\ud0dd'} | \uc138\uc158: ${s ? s.title : '\ubbf8\uc120\ud0dd'}${kb}
+${extra}
+\uc751\ub2f5\uc740 \ud55c\uad6d\uc5b4\ub85c, \ud575\uc2ec \uc704\uc8fc\ub85c \uac04\uacb0\ud558\uac8c.`;
+}
+
+function getSessionText(scope = 'session') {
+  if (scope === 'course') {
+    const c = activeCourse();
+    return c ? c.sessions.map(s => `[${s.title}]\n${s.segments.map(sg => sg.text).join(' ')}`).join('\n\n') : '';
+  }
+  const s = activeSession();
+  return s ? s.segments.map(sg => sg.text).join(' ') : '';
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// MODEL
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+function setModel(m) {
+  currentModel = m;
+  document.getElementById('mSonnet').className = 'mopt sonnet' + (m === 'sonnet' ? ' on' : '');
+  document.getElementById('mOpus').className = 'mopt opus' + (m === 'opus' ? ' on' : '');
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// RENDER
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+function renderAll() {
+  renderCourses();
+  renderSessions();
+  renderTranscript();
+  renderRight();
+  updateFooter();
+}
+
+function renderCourses() {
+  const el = document.getElementById('courseList');
+  if (!db.courses.length) {
+    el.innerHTML = '<div class="empty" style="padding:14px;flex:none"><div class="et" style="font-size:10px">+ \ub85c \uacfc\ubaa9 \ucd94\uac00</div></div>';
+    return;
+  }
+  el.innerHTML = db.courses.map(c => `
+    <div class="ci${c.id === activeCourseId ? ' active' : ''}" onclick="selectCourse('${c.id}')">
+      <div class="ci-dot" style="background:${c.color}"></div>
+      <div class="ci-name">${c.name}</div>
+      <div class="ci-cnt">${c.sessions.length}</div>
+    </div>`).join('');
+  document.getElementById('fC').textContent = db.courses.length;
+}
+
+function renderSessions() {
+  const el = document.getElementById('sessionList');
+  const c = activeCourse();
+  if (!c) { el.innerHTML = '<div class="empty" style="padding:12px;flex:none"><div class="et" style="font-size:10px">\uacfc\ubaa9\uc744 \uc120\ud0dd\ud558\uc138\uc694</div></div>'; return; }
+  if (!c.sessions.length) { el.innerHTML = '<div class="empty" style="padding:12px;flex:none"><div class="et" style="font-size:10px">\uc0c8 \uc138\uc158\uc744 \ucd94\uac00\ud558\uc138\uc694</div></div>'; return; }
+  el.innerHTML = [...c.sessions].reverse().map(s => `
+    <div class="si${s.id === activeSessionId ? ' active' : ''}" onclick="selectSession('${s.id}')">
+      <div class="si-t">${s.title}</div>
+      <div class="si-m">
+        <div class="si-d">${s.date || ''}</div>
+        <div class="si-badge ${s.type === 'live' ? 'sb-live' : 'sb-text'}">${s.type === 'live' ? '\ub179\uc74c' : '\ud14d\uc2a4\ud2b8'}</div>
+        <div class="si-d">${s.segments.length}\uac1c</div>
+      </div>
+    </div>`).join('');
+  const total = db.courses.reduce((a, c) => a + c.sessions.length, 0);
+  document.getElementById('fS').textContent = total;
+}
+
+function renderTranscript() {
+  const scroll = document.getElementById('txScroll');
+  const s = activeSession();
+  const hasSession = !!s;
+  document.getElementById('binsBtn').disabled = !hasSession || s.segments.length < 2;
+  document.getElementById('baskBtn').disabled = !hasSession;
+  document.getElementById('examBtn').disabled = !hasSession;
+  document.getElementById('hwBtn').disabled = !hasSession;
+  if (!s) {
+    scroll.innerHTML = '<div class="empty" id="txEmpty"><div class="ei">\ud83d\udcdd</div><div class="et">\uc138\uc158\uc744 \uc120\ud0dd\ud558\uac70\ub098 \uc0c8 \ub179\uc74c\uc744 \uc2dc\uc791\ud558\uc138\uc694</div></div>';
+    return;
+  }
+  scroll.innerHTML = s.segments.map((sg, i) =>
+    `<div class="seg"><span class="seg-n">${String(i+1).padStart(3,'0')}</span><span class="seg-ts">${sg.ts}</span>${sg.text}</div>`
+  ).join('');
+  scroll.scrollTop = scroll.scrollHeight;
+}
+
+function renderRight() {
+  const s = activeSession();
+  // insights
+  const ip = document.getElementById('pane-ins');
+  document.getElementById('insEmpty')?.remove();
+  const insItems = s && s.insights.length ? [...s.insights].reverse().map(renderInsCard).join('') : '';
+  if (insItems) ip.innerHTML = insItems;
+  else ip.innerHTML = '<div class="empty" id="insEmpty"><div class="ei">\ud83d\udca1</div><div class="et">\uc778\uc0ac\uc774\ud2b8 \uc694\uccad \uc2dc \uacb0\uacfc\uac00 \uc790\ub3d9 \uc800\uc7a5\ub429\ub2c8\ub2e4</div></div>';
+  document.getElementById('cntIns').textContent = s ? s.insights.length : 0;
+  // qa
+  const qp = document.getElementById('pane-qa');
+  const qaItems = s && s.qas.length ? [...s.qas].reverse().map(renderQaCard).join('') : '';
+  if (qaItems) qp.innerHTML = qaItems;
+  else qp.innerHTML = '<div class="empty" id="qaEmpty"><div class="ei">\ud83d\ude4b</div><div class="et">\uc9c8\ubb38 \ub2f5\ubcc0\uc774 \uc790\ub3d9 \uc800\uc7a5\ub429\ub2c8\ub2e4</div></div>';
+  document.getElementById('cntQa').textContent = s ? s.qas.length : 0;
+  // kb
+  renderKB();
+  // clear exam/hw results on session change
+  document.getElementById('examResults').innerHTML = '';
+  document.getElementById('hwResults').innerHTML = '';
+  updateFooter();
+}
+
+function renderInsCard(ins) {
+  const tm = {key:['ct-key','\ud575\uc2ec'],warn:['ct-warn','\uc8fc\uc758'],new:['ct-new','\uc2e0\uaddc']};
+  const [cls,lbl] = tm[ins.type] || tm.key;
+  return `<div class="card"><div class="card-hdr"><div class="ct ${cls}">${lbl}</div><div class="card-title">${ins.title||''}</div><div class="card-ts">${ins.ts}</div></div><div class="card-body">${ins.body.split('\n').filter(l=>l.trim()).map(l=>`<p>${l}</p>`).join('')}</div></div>`;
+}
+
+function renderQaCard(qa) {
+  return `<div class="card"><div class="card-hdr"><div class="ct ct-qa">Q&A</div><div class="card-title" style="font-size:10px;color:var(--tx2)">${qa.q.length>55?qa.q.slice(0,55)+'\u2026':qa.q}</div><div class="card-ts">${qa.ts}</div></div><div class="card-body">${qa.a.split('\n').filter(l=>l.trim()).map(l=>`<p>${l}</p>`).join('')}</div></div>`;
+}
+
+function renderKB() {
+  const c = activeCourse();
+  const listEl = document.getElementById('kbSrcList');
+  const emptyEl = document.getElementById('kbEmpty');
+  const titleEl = document.getElementById('kbSrcTitle');
+  if (!c || !c.kbSources || !c.kbSources.length) {
+    listEl.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = '';
+    titleEl.textContent = '';
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+  titleEl.textContent = `\uc18c\uc2a4 ${c.kbSources.length}\uac1c`;
+  listEl.innerHTML = c.kbSources.map(src => `
+    <div class="kb-src" style="margin-bottom:8px">
+      <div class="kb-src-hdr">
+        <div class="kb-src-type">${src.type === 'file' ? '\ud83d\udcc4 \ud30c\uc77c' : '\u270f\ufe0f \ud14d\uc2a4\ud2b8'}</div>
+        <div class="kb-src-name">${src.name}</div>
+        <div class="kb-src-ts" style="font-family:var(--mono);font-size:9px;color:var(--tx3);margin-right:4px">${src.ts}</div>
+        <button class="kb-src-del" onclick="delKBSrc('${src.id}')">\u2715</button>
+      </div>
+      <div class="kb-src-body">${src.content.slice(0, 200)}\u2026</div>
+    </div>`).join('');
+}
+
+function updateFooter() {
+  let ti = 0, tq = 0;
+  db.courses.forEach(c => c.sessions.forEach(s => { ti += s.insights.length; tq += s.qas.length; }));
+  document.getElementById('fI').textContent = ti;
+  document.getElementById('fQ').textContent = tq;
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// NAVIGATION
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+function selectCourse(id) {
+  stopRec();
+  activeCourseId = id;
+  activeSessionId = null;
+  const c = getCourse(id);
+  if (c) {
+    document.documentElement.style.setProperty('--cur', c.color);
+    document.getElementById('topCourse').textContent = c.name;
+    document.getElementById('topSession').textContent = '';
+    if (c.sessions.length) selectSession(c.sessions[c.sessions.length - 1].id);
+  }
+  renderAll();
+}
+
+function selectSession(id) {
+  activeSessionId = id;
+  const s = activeSession();
+  if (s) document.getElementById('topSession').textContent = s.title;
+  renderTranscript();
+  renderRight();
+  switchRTab('ins');
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// COURSE CRUD
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+function buildCPick(sel) {
+  selColor = sel;
+  document.getElementById('cpick').innerHTML = COLORS.map(c =>
+    `<div class="cpdot${c===sel?' on':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`
+  ).join('');
+}
+function pickColor(c) { selColor = c; buildCPick(c); }
+
+function openAddCourse() {
+  editingCourse = null;
+  document.getElementById('acTitle').textContent = '\uc0c8 \uacfc\ubaa9 \ucd94\uac00';
+  document.getElementById('cName').value = '';
+  document.getElementById('cKB').value = '';
+  buildCPick(COLORS[db.courses.length % COLORS.length]);
+  openModal('addCourseModal');
+  setTimeout(() => document.getElementById('cName').focus(), 100);
+}
+
+function saveCourse() {
+  const name = document.getElementById('cName').value.trim();
+  if (!name) return;
+  const kb = document.getElementById('cKB').value.trim();
+  if (editingCourse) {
+    editingCourse.name = name;
+    editingCourse.color = selColor;
+    if (kb) {
+      const existing = editingCourse.kbSources.find(s => s.name === '\ucd08\uae30 KB');
+      if (existing) existing.content = kb;
+      else editingCourse.kbSources.push({ id: uid(), name: '\ucd08\uae30 KB', type: 'text', content: kb, ts: nowStr() });
+    }
+  } else {
+    const course = {
+      id: uid(), name, color: selColor, sessions: [],
+      kbSources: kb ? [{ id: uid(), name: '\ucd08\uae30 KB', type: 'text', content: kb, ts: nowStr() }] : []
+    };
+    db.courses.push(course);
+    activeCourseId = course.id;
+    document.documentElement.style.setProperty('--cur', course.color);
+    document.getElementById('topCourse').textContent = course.name;
+  }
+  save(); closeModal('addCourseModal'); renderAll();
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// SESSION CRUD
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+function newLive() {
+  if (!activeCourseId) { alert('\uacfc\ubaa9\uc744 \uba3c\uc800 \uc120\ud0dd\ud558\uc138\uc694.'); return; }
+  const c = activeCourse();
+  const n = c.sessions.filter(s => s.type === 'live').length + 1;
+  const s = { id: uid(), title: `${c.name} ${n}\ucc28 \uac15\uc758`, date: todayStr(), type: 'live', segments: [], insights: [], qas: [] };
+  c.sessions.push(s); save();
+  selectSession(s.id); renderSessions();
+  if (!isRecording) toggleRec();
+}
+
+function openNewText() {
+  if (!activeCourseId) { alert('\uacfc\ubaa9\uc744 \uba3c\uc800 \uc120\ud0dd\ud558\uc138\uc694.'); return; }
+  const c = activeCourse();
+  const n = c.sessions.filter(s => s.type === 'text').length + 1;
+  document.getElementById('tsTitle').value = `${c.name} ${n}\ucc28 \ud14d\uc2a4\ud2b8`;
+  document.getElementById('tsDate').value = todayStr();
+  document.getElementById('tsContent').value = '';
+  openModal('textSessModal');
+  setTimeout(() => document.getElementById('tsTitle').focus(), 100);
+}
+
+function saveTextSess() {
+  const title = document.getElementById('tsTitle').value.trim();
+  const date = document.getElementById('tsDate').value;
+  const content = document.getElementById('tsContent').value.trim();
+  if (!title || !content) { alert('\uc81c\ubaa9\uacfc \ub0b4\uc6a9\uc744 \uc785\ub825\ud558\uc138\uc694.'); return; }
+  const segs = content.split(/\n{2,}|\n/).filter(l => l.trim().length > 2)
+    .map((text, i) => ({ text: text.trim(), ts: String(i + 1).padStart(3, '0') }));
+  const s = { id: uid(), title, date, type: 'text', segments: segs, insights: [], qas: [] };
+  activeCourse().sessions.push(s); save();
+  closeModal('textSessModal'); selectSession(s.id); renderSessions();
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// KNOWLEDGE BASE
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+function addKBText() {
+  const content = document.getElementById('kbPaste').value.trim();
+  const name = document.getElementById('kbSrcName').value.trim() || `\uba54\ubaa8 ${nowStr()}`;
+  if (!content) { alert('\ub0b4\uc6a9\uc744 \uc785\ub825\ud558\uc138\uc694.'); return; }
+  const c = activeCourse();
+  if (!c) { alert('\uacfc\ubaa9\uc744 \uba3c\uc800 \uc120\ud0dd\ud558\uc138\uc694.'); return; }
+  if (!c.kbSources) c.kbSources = [];
+  c.kbSources.push({ id: uid(), name, type: 'text', content, ts: nowStr() });
+  save(); renderKB();
+  document.getElementById('kbPaste').value = '';
+  document.getElementById('kbSrcName').value = '';
+}
+
+function uploadKBFile(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const c = activeCourse();
+  if (!c) { alert('\uacfc\ubaa9\uc744 \uba3c\uc800 \uc120\ud0dd\ud558\uc138\uc694.'); return; }
+  if (!c.kbSources) c.kbSources = [];
+
+  if (file.type === 'application/pdf') {
+    // PDF: extract text via FileReader as text (basic extraction)
+    const reader = new FileReader();
+    reader.onload = ev => {
+      // For PDF, store raw base64 and note it as uploaded; full extraction needs PDF.js
+      // Simple approach: read as text (works for text-layer PDFs)
+      const text = ev.target.result;
+      const cleaned = text.replace(/[^\x20-\x7E\uAC00-\uD7AF\u1100-\u11FF\u3130-\u318F]/g,' ').replace(/\s+/g,' ').trim();
+      c.kbSources.push({ id: uid(), name: file.name, type: 'file', content: cleaned.slice(0, 50000), ts: nowStr() });
+      save(); renderKB();
+    };
+    reader.readAsText(file);
+  } else {
+    // TXT/MD
+    const reader = new FileReader();
+    reader.onload = ev => {
+      c.kbSources.push({ id: uid(), name: file.name, type: 'file', content: ev.target.result.slice(0, 50000), ts: nowStr() });
+      save(); renderKB();
+    };
+    reader.readAsText(file);
+  }
+  e.target.value = '';
+}
+
+function delKBSrc(id) {
+  const c = activeCourse(); if (!c) return;
+  c.kbSources = c.kbSources.filter(s => s.id !== id);
+  save(); renderKB();
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// RECORDING (STT)
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null, isRecording = false, recSeconds = 0, recTimer = null, interimEl = null;
+const WAVE_N = 18;
+
+(function() {
+  const row = document.getElementById('waveRow');
+  for (let i = 0; i < WAVE_N; i++) { const b = document.createElement('div'); b.className = 'wb'; b.style.height = '4px'; row.appendChild(b); }
+})();
+let waveAnim = null;
+function animWave(on) {
+  const bars = document.querySelectorAll('.wb');
+  if (on) { bars.forEach(b => b.classList.add('on')); waveAnim = setInterval(() => bars.forEach(b => { b.style.height = (4 + Math.random() * 16) + 'px'; }), 80); }
+  else { clearInterval(waveAnim); bars.forEach(b => { b.style.height = '4px'; b.classList.remove('on'); }); }
+}
+
+if (SR) {
+  recognition = new SR();
+  recognition.lang = 'ko-KR'; recognition.continuous = true; recognition.interimResults = true;
+  recognition.onresult = e => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const r = e.results[i];
+      if (r.isFinal) {
+        const txt = r[0].transcript.trim();
+        if (txt.length > 1) {
+          const s = activeSession();
+          if (s) {
+            s.segments.push({ text: txt, ts: nowStr() });
+            save(); // AUTO-SAVE every segment
+            appendSeg(txt, nowStr(), s.segments.length);
+            document.getElementById('binsBtn').disabled = s.segments.length < 2;
+          }
+        }
+        interimEl?.remove(); interimEl = null;
+      } else interim += r[0].transcript;
+    }
+    if (interim) showInterim(interim);
+  };
+  recognition.onerror = () => {};
+  recognition.onend = () => { if (isRecording) recognition.start(); };
+}
+
+function toggleRec() {
+  if (!recognition) { alert('Chrome\uc744 \uc0ac\uc6a9\ud574\uc8fc\uc138\uc694.'); return; }
+  if (!activeSessionId) { alert('\uc138\uc158\uc744 \uba3c\uc800 \uc120\ud0dd\ud558\uc138\uc694.'); return; }
+  const s = activeSession();
+  if (s && s.type !== 'live') { alert('\ub179\uc74c \uc138\uc158\uc774 \uc544\ub2d9\ub2c8\ub2e4.'); return; }
+  isRecording = !isRecording;
+  const btn = document.getElementById('recBtn'), lbl = document.getElementById('recLabel'), td = document.getElementById('timerD');
+  if (isRecording) {
+    recognition.start();
+    btn.className = 'rec-btn on'; lbl.textContent = '\ub179\uc74c \uc911\uc9c0';
+    td.classList.add('on'); document.getElementById('livePill').classList.add('show');
+    document.getElementById('txEmpty')?.remove();
+    animWave(true); recSeconds = 0;
+    recTimer = setInterval(() => {
+      recSeconds++;
+      td.textContent = String(Math.floor(recSeconds / 60)).padStart(2, '0') + ':' + String(recSeconds % 60).padStart(2, '0');
+    }, 1000);
+    document.getElementById('baskBtn').disabled = false;
+  } else {
+    recognition.stop(); clearInterval(recTimer);
+    btn.className = 'rec-btn off'; lbl.textContent = '\ub179\uc74c \uc2dc\uc791';
+    td.classList.remove('on'); td.textContent = '00:00';
+    document.getElementById('livePill').classList.remove('show');
+    animWave(false);
+  }
+}
+
+function stopRec() { if (isRecording) toggleRec(); }
+
+function appendSeg(text, ts, idx) {
+  const scroll = document.getElementById('txScroll');
+  const d = document.createElement('div'); d.className = 'seg cur';
+  d.innerHTML = `<span class="seg-n">${String(idx).padStart(3,'0')}</span><span class="seg-ts">${ts}</span>${text}`;
+  scroll.appendChild(d);
+  setTimeout(() => d.classList.remove('cur'), 2000);
+  scroll.scrollTop = scroll.scrollHeight;
+}
+
+function showInterim(text) {
+  if (!interimEl) { interimEl = document.createElement('div'); interimEl.className = 'seg interim'; document.getElementById('txScroll').appendChild(interimEl); }
+  interimEl.textContent = text;
+  document.getElementById('txScroll').scrollTop = 999999;
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// AI API
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+async function callClaude(system, userMsg) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: MODELS[currentModel], max_tokens: 1500, system, messages: [{ role: 'user', content: userMsg }] })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content[0].text;
+}
+
+// \u2500\u2500 INSIGHT \u2500\u2500
+let isInsGen = false;
+async function requestInsight() {
+  if (isInsGen) return;
+  const s = activeSession();
+  if (!s || s.segments.length < 2) { alert('\ub0b4\uc6a9\uc774 \ub354 \ud544\uc694\ud569\ub2c8\ub2e4.'); return; }
+  isInsGen = true;
+  const btn = document.getElementById('binsBtn'), lbl = document.getElementById('binsLbl');
+  btn.classList.add('loading'); btn.disabled = true; lbl.textContent = '\ubd84\uc11d \uc911\u2026';
+
+  const pane = document.getElementById('pane-ins');
+  document.getElementById('insEmpty')?.remove();
+  const gid = 'gi' + Date.now();
+  const gel = document.createElement('div'); gel.className = 'gen-card'; gel.id = gid;
+  gel.innerHTML = `<div class="gdots"><span></span><span></span><span></span></div><div class="gtext">\uc778\uc0ac\uc774\ud2b8 \ubd84\uc11d \uc911\u2026</div>`;
+  pane.prepend(gel); switchRTab('ins');
+
+  try {
+    const ans = await callClaude(
+      buildSys('\ubc18\ub4dc\uc2dc JSON\ub9cc \ubc18\ud658: {"type":"key|warn|new","title":"15\uc790\uc774\ub0b4","body":"3~5\ubb38\uc7a5"}'),
+      `\uac15\uc758 \ub0b4\uc6a9:\n${getSessionText().slice(-3000)}\n\n\ud575\uc2ec \uc778\uc0ac\uc774\ud2b8 JSON\uc73c\ub85c.`
+    );
+    const parsed = JSON.parse(ans.replace(/```json|```/g, '').trim());
+    document.getElementById(gid)?.remove();
+    const ins = { id: uid(), type: parsed.type || 'key', title: parsed.title || '\uc778\uc0ac\uc774\ud2b8', body: parsed.body || '', ts: nowStr() };
+    s.insights.push(ins);
+    save(); // AUTO-SAVE
+    document.getElementById('cntIns').textContent = s.insights.length;
+    updateFooter();
+    const card = document.createElement('div'); card.className = 'card fresh';
+    card.innerHTML = renderInsCard(ins);
+    pane.prepend(card);
+    setTimeout(() => card.classList.remove('fresh'), 3000);
+  } catch(e) {
+    document.getElementById(gid)?.remove();
+    const ec = document.createElement('div'); ec.className = 'gen-card';
+    ec.innerHTML = `<div class="gtext" style="color:var(--red)">\u26a0 ${e.message}</div>`;
+    pane.prepend(ec);
+  }
+  isInsGen = false; btn.classList.remove('loading'); btn.disabled = false; lbl.textContent = '\ud83d\udca1 \uc778\uc0ac\uc774\ud2b8 \uc694\uccad';
+}
+
+// \u2500\u2500 Q&A \u2500\u2500
+let isQaGen = false;
+async function askQ() {
+  if (isQaGen) return;
+  const inp = document.getElementById('qin'), q = inp.value.trim();
+  if (!q) return;
+  inp.value = ''; isQaGen = true;
+
+  const s = activeSession();
+  const pane = document.getElementById('pane-qa');
+  document.getElementById('qaEmpty')?.remove();
+  const gid = 'gq' + Date.now();
+  const gel = document.createElement('div'); gel.className = 'gen-card'; gel.id = gid;
+  gel.innerHTML = `<div class="gdots"><span></span><span></span><span></span></div><div class="gtext">\ub2f5\ubcc0 \uc0dd\uc131 \uc911\u2026</div>`;
+  pane.prepend(gel); switchRTab('qa');
+
+  const txCtx = getSessionText();
+  const lectureSection = txCtx.length > 5 ? `\n\n[\uc624\ub298 \uac15\uc758 \ub0b4\uc6a9]\n${txCtx.slice(-2500)}` : '';
+  try {
+    const ans = await callClaude(
+      buildSys('3~5\ubb38\uc7a5 \uc774\ub0b4. \uac15\uc758 \ub0b4\uc6a9 \uc6b0\uc120 \ud65c\uc6a9. \ubd88\ud655\uc2e4 \uc2dc "~\ub85c \ubcfc \uc218 \uc788\uc2b5\ub2c8\ub2e4".'),
+      `\uc9c8\ubb38: "${q}"${lectureSection}\n\n\ub2f5\ubcc0\ud574\uc8fc\uc138\uc694.`
+    );
+    document.getElementById(gid)?.remove();
+    const qa = { id: uid(), q, a: ans, ts: nowStr() };
+    if (s) { s.qas.push(qa); save(); } // AUTO-SAVE
+    document.getElementById('cntQa').textContent = s ? s.qas.length : 0;
+    updateFooter();
+    const card = document.createElement('div'); card.className = 'card fresh';
+    card.innerHTML = renderQaCard(qa);
+    pane.prepend(card);
+    setTimeout(() => card.classList.remove('fresh'), 3000);
+  } catch(e) {
+    document.getElementById(gid)?.remove();
+    const ec = document.createElement('div'); ec.className = 'card';
+    ec.innerHTML = `<div class="card-body" style="color:var(--red)">\u26a0 ${e.message}</div>`;
+    pane.prepend(ec);
+  }
+  isQaGen = false;
+}
+
+// \u2500\u2500 EXAM \u2500\u2500
+async function runExam() {
+  const btn = document.getElementById('examBtn');
+  btn.disabled = true; btn.textContent = '\uc0dd\uc131 \uc911\u2026';
+  const scope = document.getElementById('examScope').value;
+  const hint = document.getElementById('examHint').value.trim();
+  const results = document.getElementById('examResults');
+  const gid = 'ge' + Date.now();
+  const gel = document.createElement('div'); gel.className = 'gen-card'; gel.id = gid;
+  gel.innerHTML = `<div class="gdots"><span></span><span></span><span></span></div><div class="gtext">\uc608\uc0c1 \ubb38\uc81c \uc0dd\uc131 \uc911\u2026</div>`;
+  results.prepend(gel);
+  try {
+    const ans = await callClaude(
+      buildSys('MBA \uc2dc\ud5d8 \uc608\uc0c1 \ubb38\uc81c \uc804\ubb38\uac00. \ub17c\uc220\ud615/\ub2e8\ub2f5\ud615/\uc0ac\ub840\uc801\uc6a9\ud615 \ud63c\ud569 5~8\ubb38\uc81c. \uac01 \ubb38\uc81c \uc544\ub798 \ub2f5\ubcc0 \ud0a4\uc6cc\ub4dc \uc81c\uc2dc.'),
+      `\uac15\uc758 \ub0b4\uc6a9:\n${getSessionText(scope).slice(-4000)}\n\ucd94\uac00 \ud78c\ud2b8: ${hint||'\uc5c6\uc74c'}\n\n\uc608\uc0c1 \ubb38\uc81c \uc0dd\uc131.`
+    );
+    document.getElementById(gid)?.remove();
+    const card = document.createElement('div'); card.className = 'card fresh';
+    card.innerHTML = `<div class="card-hdr"><div class="ct ct-exam">\uc2dc\ud5d8\uc900\ube44</div><div class="card-title">\uc608\uc0c1 \ubb38\uc81c</div><div class="card-ts">${nowStr()}</div></div><div class="card-body">${ans.split('\n').filter(l=>l.trim()).map(l=>`<p>${l}</p>`).join('')}</div>`;
+    results.prepend(card);
+    setTimeout(() => card.classList.remove('fresh'), 3000);
+  } catch(e) {
+    document.getElementById(gid)?.remove();
+    results.innerHTML = `<div class="gen-card"><div class="gtext" style="color:var(--red)">\u26a0 ${e.message}</div></div>`;
+  }
+  btn.disabled = false; btn.textContent = '\uc608\uc0c1 \ubb38\uc81c \uc0dd\uc131';
+}
+
+// \u2500\u2500 HW \u2500\u2500
+async function runHw() {
+  const topic = document.getElementById('hwTopic').value.trim();
+  if (!topic) { alert('\uc8fc\uc81c\ub97c \uc785\ub825\ud558\uc138\uc694.'); return; }
+  const btn = document.getElementById('hwBtn');
+  btn.disabled = true; btn.textContent = '\uc0dd\uc131 \uc911\u2026';
+  const scope = document.getElementById('hwScope').value;
+  const results = document.getElementById('hwResults');
+  const gid = 'gh' + Date.now();
+  const gel = document.createElement('div'); gel.className = 'gen-card'; gel.id = gid;
+  gel.innerHTML = `<div class="gdots"><span></span><span></span><span></span></div><div class="gtext">\uacfc\uc81c \uc544\uc774\ub514\uc5b4 \uc0dd\uc131 \uc911\u2026</div>`;
+  results.prepend(gel);
+  try {
+    const ans = await callClaude(
+      buildSys('MBA \uacfc\uc81c \uc900\ube44 \uc804\ubb38\uac00. \uac15\uc758 \ub0b4\uc6a9 \uc5f0\uacc4 \uc544\uc774\ub514\uc5b4\u00b7\ub17c\ub9ac\uad6c\uc870\u00b7\ud575\uc2ec\ub17c\uac70\u00b7\uc774\ub860/\ud504\ub808\uc784\uc6cc\ud06c \uc81c\uc2dc.'),
+      `\uacfc\uc81c \uc8fc\uc81c: "${topic}"\n\uac15\uc758 \ub0b4\uc6a9:\n${getSessionText(scope).slice(-4000)}\n\n\uc544\uc774\ub514\uc5b4\uc640 \uad6c\uc870\ub97c \uc81c\uc548\ud574\uc8fc\uc138\uc694.`
+    );
+    document.getElementById(gid)?.remove();
+    const card = document.createElement('div'); card.className = 'card fresh';
+    card.innerHTML = `<div class="card-hdr"><div class="ct ct-hw">\uacfc\uc81c\uc900\ube44</div><div class="card-title">${topic.slice(0,40)}</div><div class="card-ts">${nowStr()}</div></div><div class="card-body">${ans.split('\n').filter(l=>l.trim()).map(l=>`<p>${l}</p>`).join('')}</div>`;
+    results.prepend(card);
+    setTimeout(() => card.classList.remove('fresh'), 3000);
+  } catch(e) {
+    document.getElementById(gid)?.remove();
+    results.innerHTML = `<div class="gen-card"><div class="gtext" style="color:var(--red)">\u26a0 ${e.message}</div></div>`;
+  }
+  btn.disabled = false; btn.textContent = '\uc544\uc774\ub514\uc5b4 \uc0dd\uc131';
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// EXPORT / IMPORT
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+function exportData() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `mba-hub-backup-${todayStr()}.json`; a.click();
+}
+function importData(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const imp = JSON.parse(ev.target.result);
+      if (!imp.courses) throw new Error('\uc798\ubabb\ub41c \ud30c\uc77c');
+      if (!confirm('\ubc31\uc5c5\uc744 \ubd88\ub7ec\uc624\uba74 \ud604\uc7ac \ub370\uc774\ud130\uc5d0 \ubcd1\ud569\ub429\ub2c8\ub2e4. \uacc4\uc18d\ud560\uae4c\uc694?')) return;
+      imp.courses.forEach(ic => { if (!db.courses.find(c => c.id === ic.id)) db.courses.push(ic); });
+      save(); renderAll(); alert('\ubd88\ub7ec\uc624\uae30 \uc644\ub8cc!');
+    } catch(err) { alert('\ud30c\uc77c \uc624\ub958: ' + err.message); }
+  };
+  reader.readAsText(file); e.target.value = '';
+}
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// UI HELPERS
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+function switchRTab(tab) {
+  ['ins','qa','exam','hw','kb'].forEach(t => {
+    document.getElementById('pane-' + t).className = 'rpane' + (t === tab ? ' show' : '');
+    const cls = {ins:'ai',qa:'aq',exam:'ae',hw:'ah',kb:'ak'}[t];
+    document.getElementById('rt-' + t).className = 'rtab' + (t === tab ? ' ' + cls : '');
+  });
+}
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); }));
+
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+// INIT
+// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+load();
+buildCPick(COLORS[0]);
+renderAll();
+if (db.courses.length && !activeCourseId) selectCourse(db.courses[0].id);
+</script>
+</body>
+</html>
