@@ -1,0 +1,2394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBA Study Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07080c; --s1:#0d0e14; --s2:#13141c; --s3:#191b24; --s4:#1f2130;
+  --b:#252838; --b2:#2e3245;
+  --tx:#e2e5f5; --tx2:#7a82a8; --tx3:#454a6a;
+  --mono:'IBM Plex Mono',monospace; --sans:'Noto Sans KR',sans-serif;
+  --c0:#5b8df6; --c1:#10b981; --c2:#f59e0b; --c3:#a78bfa;
+  --c4:#ef4444; --c5:#06b6d4; --c6:#f472b6; --c7:#84cc16;
+  --ins:#10b981; --insb:rgba(16,185,129,.1);
+  --qa:#a78bfa;  --qab:rgba(167,139,250,.1);
+  --exam:#f59e0b;--examb:rgba(245,158,11,.1);
+  --hw:#06b6d4;  --hwb:rgba(6,182,212,.1);
+  --red:#ef4444;
+  --cur:#5b8df6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);display:flex;flex-direction:column;font-size:13px}
+
+/* ── TOP BAR ── */
+.topbar{display:flex;align-items:center;gap:8px;padding:0 14px;height:46px;background:var(--s1);border-bottom:1px solid var(--b);flex-shrink:0}
+.brand{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--tx2);letter-spacing:.06em;flex-shrink:0}
+.brand strong{color:var(--tx)}
+.vsep{width:1px;height:18px;background:var(--b);flex-shrink:0}
+.cur-course{font-size:11px;font-weight:500;color:var(--cur);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.cur-session{font-size:10px;color:var(--tx3);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+
+/* MODEL SELECTOR */
+.model-sel{
+  display:flex;background:var(--s2);border:1px solid var(--b);border-radius:6px;padding:2px;gap:2px;flex-shrink:0;
+}
+.mopt{padding:3px 9px;border-radius:4px;font-size:10px;cursor:pointer;border:none;background:transparent;color:var(--tx2);transition:all .2s;font-family:var(--sans);white-space:nowrap}
+.mopt.on{color:#fff}
+.mopt.sonnet.on{background:var(--c0)}
+.mopt.opus.on{background:var(--c3)}
+.mopt.haiku.on{background:var(--ins)}
+
+.topbar-right{display:flex;align-items:center;gap:6px;margin-left:auto}
+.rec-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:500;transition:all .2s;flex-shrink:0}
+.rec-btn.off{background:var(--s3);border:1px solid var(--b2);color:var(--tx2)}
+.rec-btn.off:hover{border-color:var(--cur);color:var(--cur)}
+.rec-btn.on{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);color:var(--red)}
+.rdot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.rec-btn.on .rdot{animation:blink .9s infinite}
+.timer-d{font-family:var(--mono);font-size:10px;color:var(--tx3)}
+.timer-d.on{color:var(--red)}
+.icon-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--b);background:transparent;color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s}
+.icon-btn:hover{border-color:var(--tx2);color:var(--tx)}
+.save-indicator{font-family:var(--mono);font-size:9px;color:var(--tx3);opacity:0;transition:opacity .4s}
+.save-indicator.show{opacity:1;color:var(--ins)}
+
+/* ── BODY ── */
+.body{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:200px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s1);border-right:1px solid var(--b);overflow:hidden}
+.sb-hdr{padding:10px 12px 7px;font-size:9px;font-weight:700;letter-spacing:.18em;color:var(--tx3);text-transform:uppercase;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.add-btn{width:18px;height:18px;border-radius:3px;border:1px solid var(--b2);background:transparent;color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s}
+.add-btn:hover{border-color:var(--cur);color:var(--cur)}
+.course-list{flex:1;overflow-y:auto;padding:5px}
+.ci{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:6px;cursor:pointer;transition:background .15s;margin-bottom:1px}
+.ci:hover{background:var(--s3)}
+.ci.active{background:var(--s3);box-shadow:inset 2px 0 0 var(--cur)}
+.ci-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ci-name{font-size:11px;font-weight:500;color:var(--tx2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci.active .ci-name{color:var(--tx)}
+.ci-cnt{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+.ci-del{background:transparent;border:none;color:transparent;cursor:pointer;font-size:11px;padding:0 2px;transition:color .15s;flex-shrink:0;line-height:1}
+.ci:hover .ci-del{color:var(--tx3)}
+.ci-del:hover{color:var(--red) !important}
+.si-del{background:transparent;border:none;color:transparent;cursor:pointer;font-size:11px;padding:0 2px;transition:color .15s;flex-shrink:0;line-height:1}
+.si:hover .si-del{color:var(--tx3)}
+.si-del:hover{color:var(--red) !important}
+.sb-footer{padding:8px 12px;border-top:1px solid var(--b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.sb-act{display:flex;align-items:center;gap:5px;padding:5px 7px;border-radius:5px;border:1px solid var(--b);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);font-size:10px;transition:all .2s}
+.sb-act:hover{border-color:var(--tx2);color:var(--tx)}
+
+/* ── MIDDLE ── */
+.middle{width:290px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s2);border-right:1px solid var(--b);overflow:hidden}
+
+/* SESSION LIST */
+.sl-wrap{flex-shrink:0;border-bottom:1px solid var(--b);display:flex;flex-direction:column;max-height:200px}
+.sl-hdr{padding:9px 12px 6px;font-size:9px;font-weight:700;letter-spacing:.18em;color:var(--tx3);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ns-btns{display:flex;gap:3px}
+.nsb{padding:3px 7px;border-radius:4px;border:1px solid var(--b2);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);font-size:10px;transition:all .2s}
+.nsb:hover{border-color:var(--cur);color:var(--cur)}
+.nsb.p{background:var(--cur);border-color:var(--cur);color:#fff}
+.nsb.p:hover{opacity:.85}
+.sl{overflow-y:auto;padding:5px}
+.si{padding:7px 9px;border-radius:5px;cursor:pointer;margin-bottom:2px;transition:background .15s;border-left:2px solid transparent}
+.si:hover{background:var(--s3)}
+.si.active{background:var(--s3);border-left-color:var(--cur)}
+.si-t{font-size:11px;font-weight:500;color:var(--tx2)}
+.si.active .si-t{color:var(--tx)}
+.si-m{display:flex;gap:5px;margin-top:2px;align-items:center}
+.si-d{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+.si-badge{font-size:9px;padding:1px 4px;border-radius:3px;font-weight:600}
+.sb-live{background:rgba(239,68,68,.15);color:var(--red)}
+.sb-text{background:var(--s4);color:var(--tx3)}
+
+/* TRANSCRIPT */
+.tx-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tx-hdr{padding:9px 12px 6px;font-size:9px;font-weight:700;letter-spacing:.18em;color:var(--tx3);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--b);flex-shrink:0}
+.live-pill{display:flex;align-items:center;gap:3px;font-size:9px;color:var(--red);opacity:0;transition:opacity .3s}
+.live-pill.show{opacity:1}
+.live-pill::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink .9s infinite}
+.wave-row{display:flex;gap:2px;align-items:center;padding:7px 12px;border-bottom:1px solid var(--b);height:32px;flex-shrink:0}
+.wb{width:3px;border-radius:2px;background:var(--b2);transition:height .08s}
+.wb.on{background:var(--red)}
+.tx-scroll{flex:1;overflow-y:auto;padding:8px 12px}
+.seg{padding:4px 7px;border-radius:4px;font-size:11px;line-height:1.7;color:var(--tx3);border-left:2px solid transparent;margin-bottom:1px;transition:background .2s}
+.seg:hover{background:var(--s3)}
+.seg.cur{color:var(--tx);border-left-color:var(--cur);background:var(--s3)}
+.seg.interim{color:var(--tx3);font-style:italic}
+.seg-n{font-family:var(--mono);font-size:9px;color:var(--b2);margin-right:4px}
+.seg-ts{font-family:var(--mono);font-size:9px;color:var(--tx3);margin-right:4px}
+
+/* CONTROLS */
+.tx-ctrl{border-top:1px solid var(--b);padding:7px 10px;display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.ins-row{display:flex;gap:5px}
+.bins{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:6px;border-radius:5px;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:500;background:var(--insb);border:1px solid rgba(16,185,129,.25);color:var(--ins);transition:all .2s}
+.bins:hover:not(:disabled){background:rgba(16,185,129,.2)}
+.bins:disabled{opacity:.3;cursor:not-allowed}
+.bins-dot{width:5px;height:5px;border-radius:50%;background:var(--ins);flex-shrink:0}
+.bins.loading .bins-dot{animation:blink .6s infinite}
+.qa-row{display:flex;gap:5px}
+.qin{flex:1;background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:6px 9px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;transition:border-color .2s}
+.qin:focus{border-color:var(--cur)}
+.qin::placeholder{color:var(--tx3)}
+.bask{padding:6px 9px;border-radius:5px;border:none;cursor:pointer;font-family:var(--sans);font-size:10px;color:#fff;background:var(--cur);transition:opacity .2s;white-space:nowrap}
+.bask:hover{opacity:.85}
+.bask:disabled{opacity:.3;cursor:not-allowed}
+
+/* ── RIGHT ── */
+.right{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.rtabs{display:flex;border-bottom:1px solid var(--b);flex-shrink:0;background:var(--s1)}
+.rtab{flex:1;padding:9px 4px;font-size:10px;font-weight:500;text-align:center;cursor:pointer;border:none;background:transparent;color:var(--tx2);border-bottom:2px solid transparent;transition:all .2s;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:3px}
+.rtab.ai{color:var(--ins);border-bottom-color:var(--ins)}
+.rtab.aq{color:var(--qa);border-bottom-color:var(--qa)}
+.rtab.ae{color:var(--exam);border-bottom-color:var(--exam)}
+.rtab.ah{color:var(--hw);border-bottom-color:var(--hw)}
+.rtab.ak{color:var(--c5);border-bottom-color:var(--c5)}
+.rbadge{font-family:var(--mono);font-size:9px;padding:1px 4px;border-radius:7px;font-weight:600}
+.rib{background:var(--insb);color:var(--ins)}
+.rqb{background:var(--qab);color:var(--qa)}
+.reb{background:var(--examb);color:var(--exam)}
+.rhb{background:var(--hwb);color:var(--hw)}
+.rpane{display:none;flex:1;overflow-y:auto;padding:12px 16px;flex-direction:column;gap:10px}
+.rpane.show{display:flex}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--b);border-radius:9px;overflow:hidden;animation:slin .35s cubic-bezier(.22,1,.36,1)}
+.card.fresh{border-color:var(--cur)}
+@keyframes slin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card-hdr{display:flex;align-items:center;gap:7px;padding:7px 11px;background:var(--s2);border-bottom:1px solid var(--b)}
+.ct{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:7px;flex-shrink:0}
+.ct-key{background:var(--insb);color:var(--ins)}
+.ct-warn{background:var(--examb);color:var(--exam)}
+.ct-new{background:rgba(91,141,246,.12);color:var(--c0)}
+.ct-qa{background:var(--qab);color:var(--qa)}
+.ct-exam{background:var(--examb);color:var(--exam)}
+.ct-hw{background:var(--hwb);color:var(--hw)}
+.ct-kb{background:rgba(6,182,212,.12);color:var(--c5)}
+.card-title{font-size:11px;color:var(--tx);font-weight:500;flex:1}
+.card-ts{font-family:var(--mono);font-size:9px;color:var(--tx3);flex-shrink:0}
+.card-body{padding:11px;font-size:12px;line-height:1.85;color:var(--tx)}
+.card-body p{margin-bottom:5px}
+.card-body p:last-child{margin-bottom:0}
+.card-body strong{color:var(--ins);font-weight:500}
+
+/* GEN INDICATOR */
+.gen-card{background:var(--s1);border:1px solid var(--b);border-radius:9px;padding:12px;display:flex;align-items:center;gap:9px;animation:slin .35s cubic-bezier(.22,1,.36,1)}
+.gdots{display:flex;gap:3px}
+.gdots span{width:5px;height:5px;border-radius:50%;animation:bounce 1.2s infinite}
+.gdots span:nth-child(1){background:var(--ins);animation-delay:0s}
+.gdots span:nth-child(2){background:var(--qa);animation-delay:.2s}
+.gdots span:nth-child(3){background:var(--c0);animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.3}40%{transform:translateY(-5px);opacity:1}}
+.gtext{font-size:11px;color:var(--tx2)}
+
+/* KB PANE */
+.kb-controls{background:var(--s2);border:1px solid var(--b);border-radius:9px;padding:12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.kb-label{font-size:9px;color:var(--tx2);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.kb-upload-row{display:flex;gap:6px}
+.kb-upload-btn{flex:1;padding:7px;border-radius:5px;border:1px dashed var(--b2);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);font-size:11px;transition:all .2s;text-align:center}
+.kb-upload-btn:hover{border-color:var(--c5);color:var(--c5)}
+.kb-paste-input{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:7px 9px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;transition:border-color .2s;resize:none;width:100%}
+.kb-paste-input:focus{border-color:var(--c5)}
+.kb-paste-input::placeholder{color:var(--tx3)}
+.kb-add-btn{padding:6px 12px;border-radius:5px;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;color:#fff;background:var(--c5);transition:opacity .2s;align-self:flex-start}
+.kb-add-btn:hover{opacity:.85}
+.kb-src-title{font-size:9px;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+
+/* KB SOURCE CARD */
+.kb-src{background:var(--s2);border:1px solid var(--b);border-radius:7px;overflow:hidden}
+.kb-src-hdr{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--s3);border-bottom:1px solid var(--b)}
+.kb-src-type{font-size:9px;padding:1px 5px;border-radius:5px;font-weight:700;background:rgba(6,182,212,.12);color:var(--c5)}
+.kb-src-name{font-size:11px;color:var(--tx2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kb-src-del{background:transparent;border:none;color:var(--tx3);cursor:pointer;font-size:12px;transition:color .2s;padding:0 2px}
+.kb-src-del:hover{color:var(--red)}
+.kb-src-body{padding:8px 10px;font-size:11px;line-height:1.6;color:var(--tx3);max-height:80px;overflow:hidden;position:relative}
+.kb-src-body::after{content:'';position:absolute;bottom:0;left:0;right:0;height:20px;background:linear-gradient(transparent,var(--s2))}
+/* ─── FILE MANAGEMENT ─── */
+.kb-section-hdr{display:flex;align-items:center;justify-content:space-between;font-size:9px;font-weight:700;letter-spacing:.15em;color:var(--tx3);text-transform:uppercase;margin-bottom:6px}
+.kb-section-hdr span{font-family:var(--mono);font-size:9px;color:var(--tx3);font-weight:400;letter-spacing:0;text-transform:none}
+.file-drop-zone{border:1px dashed var(--b2);border-radius:6px;padding:10px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:6px}
+.file-drop-zone:hover,.file-drop-zone.drag-over{border-color:var(--c5);background:rgba(6,182,212,.05)}
+.file-drop-zone-text{font-size:10px;color:var(--tx3);line-height:1.6}
+.fcard{background:var(--s2);border:1px solid var(--b);border-radius:6px;margin-bottom:4px;overflow:hidden}
+.fcard-hdr{display:flex;align-items:center;gap:6px;padding:5px 8px}
+.fcard-icon{font-size:13px;flex-shrink:0}
+.fcard-name{font-size:11px;color:var(--tx2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fcard-type{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:600;flex-shrink:0}
+.ft-pdf{background:rgba(239,68,68,.12);color:var(--red)}
+.ft-img{background:rgba(167,139,250,.12);color:var(--qa)}
+.ft-txt{background:rgba(16,185,129,.12);color:var(--ins)}
+.ft-ppt{background:rgba(245,158,11,.12);color:var(--exam)}
+.ft-other{background:var(--s4);color:var(--tx3)}
+.fcard-actions{display:flex;gap:2px;flex-shrink:0}
+.fcard-btn{padding:2px 6px;border-radius:4px;border:1px solid var(--b);background:transparent;color:var(--tx3);cursor:pointer;font-size:10px;font-family:var(--sans);transition:all .15s}
+.fcard-btn:hover{border-color:var(--tx2);color:var(--tx)}
+.fcard-btn.del:hover{border-color:rgba(239,68,68,.4);color:var(--red)}
+.session-file-section{background:var(--s2);border:1px solid var(--b);border-radius:8px;overflow:hidden;margin-bottom:8px}
+.session-file-hdr{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--s3);border-bottom:1px solid var(--b);cursor:pointer}
+.session-file-hdr:hover{background:var(--s4)}
+.session-file-body{padding:8px 10px;display:flex;flex-direction:column;gap:4px}
+.sstat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.kb-add-row{display:flex;gap:5px;margin-top:6px}
+
+/* EXAM/HW CONTROLS */
+.mode-ctrl{background:var(--s2);border:1px solid var(--b);border-radius:9px;padding:12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.mc-label{font-size:9px;color:var(--tx2);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.mc-desc{font-size:11px;color:var(--tx3);line-height:1.6}
+.mc-sel{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:6px 8px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;cursor:pointer;width:100%}
+.mc-tin{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:6px 8px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;resize:none;width:100%}
+.mc-tin::placeholder{color:var(--tx3)}
+.mc-btn{padding:7px 12px;border-radius:5px;border:none;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:500;color:#fff;transition:opacity .2s;align-self:flex-start}
+.mc-btn:hover{opacity:.85}
+.mc-btn:disabled{opacity:.3;cursor:not-allowed}
+.mc-btn.exam{background:var(--exam)}
+.mc-btn.hw{background:var(--hw)}
+
+/* EMPTY */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--tx3);text-align:center;padding:30px}
+.ei{font-size:28px;opacity:.2}
+.et{font-size:11px;line-height:1.7;max-width:180px}
+
+/* MODALS */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--s2);border:1px solid var(--b2);border-radius:11px;width:420px;max-width:94vw;overflow:hidden;animation:slin .3s cubic-bezier(.22,1,.36,1)}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--b)}
+.mtitle{font-size:13px;font-weight:600;color:var(--tx)}
+.mclose{background:transparent;border:none;color:var(--tx2);cursor:pointer;font-size:18px;line-height:1;padding:0;transition:color .2s}
+.mclose:hover{color:var(--tx)}
+.mbody{padding:16px;display:flex;flex-direction:column;gap:12px}
+.frow{display:flex;flex-direction:column;gap:5px}
+.flabel{font-size:10px;color:var(--tx2);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.finput{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:8px 10px;font-size:12px;font-family:var(--sans);color:var(--tx);outline:none;transition:border-color .2s}
+.finput:focus{border-color:var(--cur)}
+.finput::placeholder{color:var(--tx3)}
+.ftarea{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:8px 10px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;transition:border-color .2s;resize:vertical;min-height:90px}
+.ftarea:focus{border-color:var(--cur)}
+.ftarea::placeholder{color:var(--tx3)}
+.cpick{display:flex;gap:7px;flex-wrap:wrap}
+.cpdot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.cpdot.on{border-color:#fff;transform:scale(1.15)}
+.mfooter{padding:10px 16px;border-top:1px solid var(--b);display:flex;justify-content:flex-end;gap:7px}
+.btn-cancel{padding:6px 12px;border-radius:5px;border:1px solid var(--b2);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);font-size:11px;transition:all .2s}
+.btn-cancel:hover{border-color:var(--tx2);color:var(--tx)}
+.btn-ok{padding:6px 14px;border-radius:5px;border:none;background:var(--cur);color:#fff;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:500;transition:opacity .2s}
+.btn-ok:hover{opacity:.85}
+.paste-area{background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:8px 10px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;resize:vertical;min-height:120px;width:100%}
+.paste-area:focus{border-color:var(--cur)}
+.paste-area::placeholder{color:var(--tx3)}
+
+/* FOOTER */
+.footer{display:flex;align-items:center;gap:8px;padding:5px 14px;background:var(--s1);border-top:1px solid var(--b);flex-shrink:0}
+.fstat{font-family:var(--mono);font-size:9px;color:var(--tx3)}
+.fstat em{color:var(--tx2);font-style:normal}
+.phase-badge{font-size:8px;padding:2px 6px;border-radius:8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:var(--exam);font-family:var(--mono)}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.si-edit{background:transparent;border:none;color:transparent;cursor:pointer;font-size:10px;padding:0 2px;transition:color .15s;flex-shrink:0;line-height:1}
+.si:hover .si-edit{color:var(--tx3)}
+.si-edit:hover{color:var(--c5) !important}
+.tx-hdr-title{font-size:11px;font-weight:500;color:var(--tx2);flex:1;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-hdr-title:hover{color:var(--tx)}
+.rec-chunk-sep{display:flex;align-items:center;gap:6px;padding:4px 0;color:var(--tx3);font-size:9px;font-family:var(--mono)}
+.rec-chunk-sep::before,.rec-chunk-sep::after{content:'';flex:1;height:1px;background:var(--b)}
+/* ─── SETTINGS MODAL ─── */
+.settings-modal{width:520px}
+.settings-tabs{display:flex;gap:2px;padding:0 16px;border-bottom:1px solid var(--b);background:var(--s3);flex-shrink:0}
+.stab{padding:8px 14px;font-size:11px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--tx3);border-bottom:2px solid transparent;transition:all .2s;font-family:var(--sans)}
+.stab.on{color:var(--c5);border-bottom-color:var(--c5)}
+.stab:hover:not(.on){color:var(--tx2)}
+.spane{display:none;flex-direction:column;gap:12px;padding:16px}
+.spane.show{display:flex}
+.sgroup{background:var(--s3);border:1px solid var(--b);border-radius:8px;overflow:hidden}
+.sgroup-hdr{padding:8px 12px;font-size:9px;font-weight:700;letter-spacing:.15em;color:var(--tx3);text-transform:uppercase;border-bottom:1px solid var(--b);background:var(--s4)}
+.srow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--b)}
+.srow:last-child{border-bottom:none}
+.srow-label{font-size:11px;color:var(--tx2);flex:1;line-height:1.4}
+.srow-sub{font-size:10px;color:var(--tx3);margin-top:1px}
+.srow-ctrl{flex-shrink:0}
+.sinput{background:var(--s2);border:1px solid var(--b);border-radius:5px;padding:5px 8px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;transition:border-color .2s;width:160px}
+.sinput:focus{border-color:var(--c5)}
+.sinput::placeholder{color:var(--tx3)}
+.sinput.wide{width:220px}
+.sinput.sm{width:70px;text-align:center}
+.stoggle{position:relative;width:36px;height:20px;flex-shrink:0}
+.stoggle input{opacity:0;width:0;height:0;position:absolute}
+.stoggle-slider{position:absolute;inset:0;background:var(--b2);border-radius:20px;cursor:pointer;transition:.2s}
+.stoggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.stoggle input:checked + .stoggle-slider{background:var(--c5)}
+.stoggle input:checked + .stoggle-slider::before{transform:translateX(16px)}
+.sselect{background:var(--s2);border:1px solid var(--b);border-radius:5px;padding:5px 8px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;cursor:pointer;width:160px}
+.sbadge{font-size:9px;padding:2px 6px;border-radius:8px;background:rgba(6,182,212,.12);color:var(--c5);font-family:var(--mono)}
+.sinfo{font-size:10px;color:var(--tx3);padding:8px 12px;line-height:1.6}
+.drive-btn{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;border:1px solid var(--b2);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--sans);font-size:10px;transition:all .2s;flex-shrink:0}
+.drive-btn:hover{border-color:var(--tx2);color:var(--tx)}
+.drive-btn.connected{border-color:rgba(16,185,129,.4);color:var(--ins)}
+.drive-btn.error{border-color:rgba(239,68,68,.4);color:var(--red)}
+.sync-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.drive-btn.syncing .sync-dot{animation:blink .6s infinite}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  // Configure PDF.js worker
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+</script>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">MBA<strong>·HUB</strong></div>
+  <div class="vsep"></div>
+  <div class="cur-course" id="topCourse">과목 선택</div>
+  <div class="cur-session" id="topSession"></div>
+  <div class="vsep"></div>
+  <!-- MODEL SELECTOR -->
+  <div class="model-sel">
+    <button class="mopt" id="mHaiku"  onclick="setModel('haiku')">Haiku</button>
+    <button class="mopt sonnet on" id="mSonnet" onclick="setModel('sonnet')">Sonnet</button>
+    <button class="mopt opus" id="mOpus"   onclick="setModel('opus')">Opus</button>
+  </div>
+  <div class="topbar-right">
+    <button class="rec-btn off" id="recBtn" onclick="toggleRec()">
+      <div class="rdot"></div><span id="recLabel">녹음 시작</span>
+    </button>
+    <div class="timer-d" id="timerD">00:00</div>
+    <div class="vsep"></div>
+    <div class="save-indicator" id="saveInd" title="로컬 자동저장 상태">✓ 저장됨</div>
+    <button class="drive-btn" id="driveBtn" onclick="handleGoogleLogin()" title="Google Drive 동기화 — 클릭하여 연결"><div class="sync-dot"></div><span id="driveLbl">☁ Drive 연결</span></button>
+    <div class="vsep"></div>
+    <button class="icon-btn" title="백업 파일 다운로드" onclick="exportData()" style="font-size:9px;padding:4px 7px">↓ 백업</button>
+    <button class="icon-btn" title="백업 파일 불러오기" onclick="document.getElementById('impFile').click()" style="font-size:9px;padding:4px 7px">↑ 복원</button>
+    <input type="file" id="impFile" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="icon-btn" title="설정" onclick="openSettings()">⚙</button>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-hdr">과목 <button class="add-btn" onclick="openAddCourse()">+</button></div>
+    <div class="course-list" id="courseList"></div>
+    <div class="sb-footer">
+      <button class="sb-act" onclick="exportData()" title="백업 JSON 다운로드">📤 백업</button>
+      <button class="sb-act" onclick="document.getElementById('impFile').click()" title="백업 JSON 불러오기">📥 복원</button>
+    </div>
+  </div>
+
+  <!-- MIDDLE -->
+  <div class="middle">
+    <div class="sl-wrap">
+      <div class="sl-hdr">세션
+        <div class="ns-btns">
+          <button class="nsb" onclick="openNewText()">+ 텍스트</button>
+          <button class="nsb p" onclick="newLive()">+ 녹음</button>
+        </div>
+      </div>
+      <div class="sl" id="sessionList"></div>
+    </div>
+    <div class="tx-wrap">
+      <div class="tx-hdr" style="gap:6px">
+        <span class="tx-hdr-title" id="txHdrTitle" onclick="renameActiveSession()" title="클릭하여 세션명 수정">트랜스크립트</span>
+        <div class="live-pill" id="livePill">LIVE</div>
+      </div>
+      <div class="wave-row" id="waveRow"></div>
+      <div class="tx-scroll" id="txScroll">
+        <div class="empty" id="txEmpty"><div class="ei">📝</div><div class="et">세션을 선택하거나 새 녹음을 시작하세요</div></div>
+      </div>
+      <div class="tx-ctrl">
+        <div class="ins-row">
+          <button class="bins" id="binsBtn" onclick="requestInsight()" disabled>
+            <div class="bins-dot"></div><span id="binsLbl">💡 인사이트 요청</span>
+          </button>
+        </div>
+        <div class="qa-row">
+          <input class="qin" id="qin" placeholder="질문 입력 후 Enter…" onkeydown="if(event.key==='Enter')askQ()">
+          <button class="bask" id="baskBtn" onclick="askQ()" disabled>질문</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="rtabs">
+      <button class="rtab ai" id="rt-ins"  onclick="switchRTab('ins')">💡 인사이트 <span class="rbadge rib" id="cntIns">0</span></button>
+      <button class="rtab"    id="rt-qa"   onclick="switchRTab('qa')">🙋 Q&A <span class="rbadge rqb" id="cntQa">0</span></button>
+      <button class="rtab"    id="rt-exam" onclick="switchRTab('exam')">📝 시험준비</button>
+      <button class="rtab"    id="rt-hw"   onclick="switchRTab('hw')">📋 과제준비</button>
+      <button class="rtab"    id="rt-kb"   onclick="switchRTab('kb')">🗂 자료관리</button>
+    </div>
+
+    <div class="rpane show" id="pane-ins">
+      <div class="empty" id="insEmpty"><div class="ei">💡</div><div class="et">인사이트 요청 버튼을 누르면 분석 결과가 자동 저장됩니다</div></div>
+    </div>
+    <div class="rpane" id="pane-qa">
+      <div class="empty" id="qaEmpty"><div class="ei">🙋</div><div class="et">질문을 입력하면 답변이 자동 저장됩니다</div></div>
+    </div>
+
+    <!-- EXAM -->
+    <div class="rpane" id="pane-exam">
+      <div class="mode-ctrl">
+        <div class="mc-label">📝 시험 준비</div>
+        <div class="mc-desc">현재 세션 또는 과목 전체를 기반으로 예상 문제를 생성합니다.</div>
+        <select class="mc-sel" id="examScope"><option value="session">현재 세션만</option><option value="course">이 과목 전체 세션</option></select>
+        <textarea class="mc-tin" id="examHint" placeholder="추가 힌트 (선택): 예) 3장 중심으로…" rows="2"></textarea>
+        <button class="mc-btn exam" id="examBtn" onclick="runExam()" disabled>예상 문제 생성</button>
+      </div>
+      <div id="examResults"></div>
+    </div>
+
+    <!-- HW -->
+    <div class="rpane" id="pane-hw">
+      <div class="mode-ctrl">
+        <div class="mc-label">📋 과제 준비</div>
+        <div class="mc-desc">과제 주제를 입력하면 강의 내용 기반 아이디어를 생성합니다.</div>
+        <textarea class="mc-tin" id="hwTopic" placeholder="과제 주제 또는 지시사항…" rows="3"></textarea>
+        <select class="mc-sel" id="hwScope"><option value="session">현재 세션만</option><option value="course">이 과목 전체 세션</option></select>
+        <button class="mc-btn hw" id="hwBtn" onclick="runHw()" disabled>아이디어 생성</button>
+      </div>
+      <div id="hwResults"></div>
+    </div>
+
+    <!-- 자료관리 통합 탭 -->
+    <div class="rpane" id="pane-kb">
+      <div id="kbDashboard">
+        <div class="empty"><div class="ei">🗂</div><div class="et">과목을 선택하면 자료관리 화면이 표시됩니다</div></div>
+      </div>
+      <!-- hidden file inputs -->
+      <input type="file" id="courseFileInput" multiple accept=".pdf,.txt,.md,.jpg,.jpeg,.png,.pptx,.docx" style="display:none" onchange="uploadCourseFiles(event)">
+      <input type="file" id="sessionFileInput" multiple accept=".pdf,.txt,.md,.jpg,.jpeg,.png,.pptx,.docx" style="display:none" onchange="uploadSessionFiles(event)">
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="fstat">과목 <em id="fC">0</em> · 세션 <em id="fS">0</em> · 인사이트 <em id="fI">0</em> · Q&A <em id="fQ">0</em></div>
+  <div class="phase-badge" id="footerBadge" style="margin-left:auto;cursor:pointer" onclick="handleGoogleLogin()" title="Drive 동기화">💾 localStorage</div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="addCourseModal">
+  <div class="modal">
+    <div class="mhdr"><div class="mtitle" id="acTitle">새 과목 추가</div><button class="mclose" onclick="closeModal('addCourseModal')">×</button></div>
+    <div class="mbody">
+      <div class="frow"><div class="flabel">과목명</div><input class="finput" id="cName" placeholder="예: KMB 520 마케팅관리"></div>
+      <div class="frow"><div class="flabel">색상</div><div class="cpick" id="cpick"></div></div>
+      <div class="frow"><div class="flabel">초기 Knowledge Base</div><textarea class="ftarea" id="cKB" placeholder="강의 핵심 개념, 교수님 스타일, 과제 분석 내용 등…"></textarea></div>
+    </div>
+    <div class="mfooter"><button class="btn-cancel" onclick="closeModal('addCourseModal')">취소</button><button class="btn-ok" onclick="saveCourse()">저장</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="textSessModal">
+  <div class="modal">
+    <div class="mhdr"><div class="mtitle">텍스트 세션 추가</div><button class="mclose" onclick="closeModal('textSessModal')">×</button></div>
+    <div class="mbody">
+      <div class="frow"><div class="flabel">세션 제목</div><input class="finput" id="tsTitle" placeholder="예: 3강 소비자행동론"></div>
+      <div class="frow"><div class="flabel">날짜</div><input class="finput" type="date" id="tsDate"></div>
+      <div class="frow"><div class="flabel">강의 텍스트</div><textarea class="paste-area" id="tsContent" placeholder="NotebookLM 변환 텍스트, 강의 노트, 녹취록 등을 붙여넣으세요…"></textarea></div>
+    </div>
+    <div class="mfooter"><button class="btn-cancel" onclick="closeModal('textSessModal')">취소</button><button class="btn-ok" onclick="saveTextSess()">저장</button></div>
+  </div>
+</div>
+
+<script>
+
+// ═══════════════════════════════════════════════════
+// SETTINGS SYSTEM
+// ═══════════════════════════════════════════════════
+const CFG_DEFAULTS = {
+  anthropicKey: '',
+  geminiKey: '',
+  geminiModel: 'gemini-2.5-flash',
+  recLang: 'ko-KR',
+  minSegLen: 2,
+  autoTranscribe: true,
+  defaultModel: 'sonnet',
+  maxTokens: 1500,
+  ctxInsight: 3000,
+  ctxQa: 2500,
+  ctxExam: 4000,
+  autoInsight: false,
+  autoInsightMin: 10,
+  userName: 'Khoon',
+  userOrg: '',
+  aiStyle: 'normal',
+  driveSaveDelay: 3,
+};
+
+function getCFG(key) {
+  const raw = localStorage.getItem('cfg_' + key);
+  if (raw === null) return CFG_DEFAULTS[key];
+  try {
+    const p = JSON.parse(raw);
+    return p;
+  } catch { return raw; }
+}
+function setCFG(key, val) { localStorage.setItem('cfg_' + key, JSON.stringify(val)); }
+
+// Compatibility helpers
+function getGeminiKey()    { return getCFG('geminiKey'); }
+function getGeminiModel()  { return getCFG('geminiModel'); }
+function getAnthropicKey() { return getCFG('anthropicKey'); }
+
+// Migrate old localStorage keys on first load
+function migrateLegacySettings() {
+  // Clear any leftover anthropic key from localStorage (now handled server-side)
+  localStorage.removeItem('anthropic_key');
+  localStorage.removeItem('cfg_anthropicKey');
+  const map = { 'gemini_key':'geminiKey', 'gemini_model':'geminiModel' };
+  Object.entries(map).forEach(([old, newKey]) => {
+    const v = localStorage.getItem(old);
+    if (v && !localStorage.getItem('cfg_' + newKey)) {
+      setCFG(newKey, v); localStorage.removeItem(old);
+    }
+  });
+  // If autoTranscribe was never set, ensure default true
+  if (localStorage.getItem('cfg_autoTranscribe') === null) {
+    setCFG('autoTranscribe', true);
+  }
+}
+
+// Auto-insight timer
+let autoInsightTimer = null;
+function resetAutoInsight() {
+  clearInterval(autoInsightTimer);
+  if (getCFG('autoInsight') && isRecording) {
+    const mins = parseInt(getCFG('autoInsightMin')) || 10;
+    autoInsightTimer = setInterval(() => {
+      if (isRecording) requestInsight();
+    }, mins * 60 * 1000);
+  }
+}
+
+function switchStab(tab) {
+  ['api','rec','ai','user','ui'].forEach(t => {
+    document.getElementById('stab-' + t).className = 'stab' + (t === tab ? ' on' : '');
+    document.getElementById('spane-' + t).className = 'spane' + (t === tab ? ' show' : '');
+  });
+}
+
+function openSettings() {
+  // API
+  // anthropicKey managed server-side via Vercel env
+  document.getElementById('s-geminiKey').value = getCFG('geminiKey');
+  document.getElementById('s-geminiModel').value = getCFG('geminiModel');
+  // Recording
+  document.getElementById('s-recLang').value = getCFG('recLang');
+  document.getElementById('s-minSegLen').value = getCFG('minSegLen');
+  document.getElementById('s-autoTranscribe').checked = getCFG('autoTranscribe');
+  // AI
+  document.getElementById('s-defaultModel').value = getCFG('defaultModel');
+  document.getElementById('s-maxTokens').value = getCFG('maxTokens');
+  document.getElementById('s-ctxInsight').value = getCFG('ctxInsight');
+  document.getElementById('s-ctxQa').value = getCFG('ctxQa');
+  document.getElementById('s-ctxExam').value = getCFG('ctxExam');
+  document.getElementById('s-autoInsight').checked = getCFG('autoInsight');
+  document.getElementById('s-autoInsightMin').value = getCFG('autoInsightMin');
+  // User
+  document.getElementById('s-userName').value = getCFG('userName');
+  document.getElementById('s-userOrg').value = getCFG('userOrg');
+  document.getElementById('s-aiStyle').value = getCFG('aiStyle');
+  // UI
+  document.getElementById('s-driveSaveDelay').value = getCFG('driveSaveDelay');
+  switchStab('api');
+  openModal('settingsModal');
+}
+
+function saveSettings() {
+  // anthropicKey not stored client-side
+  setCFG('geminiKey',    document.getElementById('s-geminiKey').value.trim());
+  setCFG('geminiModel',  document.getElementById('s-geminiModel').value.trim() || 'gemini-2.5-flash');
+  setCFG('recLang',      document.getElementById('s-recLang').value);
+  setCFG('minSegLen',    parseInt(document.getElementById('s-minSegLen').value) || 2);
+  setCFG('autoTranscribe', document.getElementById('s-autoTranscribe').checked);
+  setCFG('defaultModel', document.getElementById('s-defaultModel').value);
+  setCFG('maxTokens',    parseInt(document.getElementById('s-maxTokens').value) || 1500);
+  setCFG('ctxInsight',   parseInt(document.getElementById('s-ctxInsight').value) || 3000);
+  setCFG('ctxQa',        parseInt(document.getElementById('s-ctxQa').value) || 2500);
+  setCFG('ctxExam',      parseInt(document.getElementById('s-ctxExam').value) || 4000);
+  setCFG('autoInsight',  document.getElementById('s-autoInsight').checked);
+  setCFG('autoInsightMin', parseInt(document.getElementById('s-autoInsightMin').value) || 10);
+  setCFG('userName',     document.getElementById('s-userName').value.trim() || 'Khoon');
+  setCFG('userOrg',      document.getElementById('s-userOrg').value.trim());
+  setCFG('aiStyle',      document.getElementById('s-aiStyle').value);
+  setCFG('driveSaveDelay', parseInt(document.getElementById('s-driveSaveDelay').value) || 3);
+
+  // Apply immediately
+  applySettings();
+  closeModal('settingsModal');
+}
+
+function applySettings() {
+  // Model
+  setModel(getCFG('defaultModel'));
+  // Drive label (username)
+  const un = getCFG('userName');
+  const driveLbl = document.getElementById('driveLbl');
+  if (driveLbl && driveAccessToken) driveLbl.textContent = '● ' + un;
+  // Auto-insight
+  resetAutoInsight();
+  // STT language (apply on next recording start)
+  if (recognition) recognition.lang = getCFG('recLang');
+}
+
+function resetAllData() {
+  if (!confirm('모든 과목·세션·AI 결과가 삭제됩니다. 계속하시겠습니까?')) return;
+  if (!confirm('정말 삭제합니다. 이 작업은 되돌릴 수 없습니다.')) return;
+  db = { courses: [] };
+  localStorage.removeItem('mba_hub_v2');
+  seedKMB520();
+  renderAll();
+  closeModal('settingsModal');
+  alert('초기화 완료. KMB 520 과목이 새로 생성됐습니다.');
+}
+
+// ═══════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════
+const COLORS = ['#5b8df6','#10b981','#f59e0b','#a78bfa','#ef4444','#06b6d4','#f472b6','#84cc16'];
+const MODELS = {
+  haiku:  'claude-haiku-4-5-20251001',
+  sonnet: 'claude-sonnet-4-6',
+  opus:   'claude-opus-4-6',
+};
+const DRIVE_CLIENT_ID = '19709245842-l6vo957287pomcev8c51sck00lps6ref.apps.googleusercontent.com';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const DRIVE_FILE_NAME = 'mba-hub-data.json';
+const KMB520_KB = `## KMB 520 마케팅관리 — 김재환 교수 (고려대 KMBA)
+1강: 마케팅=교환시스템, 펀더멘털 vs 디테일, 대체재로 가치 역산, Core Competence=선순환 구조
+2강: 3C(Customer=구매자≠최종소비자), Unsought demand, Value Proposition 한 문장, "당연한 것에 질문"
+3강: SEO→GEO 전환, AI탐색=스펙 기반 추천↑, 백엔드 표준화가 경쟁우위
+4강: "변하지 않는 것으로 변할 것을 예측", 질문과 답 동시 설계, OSMU
+코스맥스 팀 과제: Position(K-뷰티 ODM 1위, ~2조), Advantage(해자3축-데이터·특허·파트너십), Competition(실리콘투 위협, 비대칭 구조), AI Strategy(D프리미엄4차원·전략4축·Global Beauty OS)
+팩트: 조선미녀→한국콜마, 80%→30%타격, 특허3324건, Anua×COSMAX Coincelle=RTB`;
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let db = { courses: [] };
+let activeCourseId = null, activeSessionId = null;
+let currentModel = 'sonnet';
+let editingCourse = null, selColor = COLORS[0];
+let saveTimeout = null;
+let driveAccessToken = null, driveFileId = null, driveSaveTimer = null;
+
+// ═══════════════════════════════════════
+// PERSISTENCE
+// ═══════════════════════════════════════
+function stripBase64ForLocal(dbObj) {
+  // Drive 연동 시 로컬에는 base64 제외, 플래그만 유지
+  const copy = JSON.parse(JSON.stringify(dbObj));
+  copy.courses.forEach(c => {
+    (c.courseFiles || []).forEach(f => { if (f.base64Data) { f.base64Data = null; f._b64stripped = true; } });
+    c.sessions.forEach(s => {
+      (s.sessionFiles || []).forEach(f => { if (f.base64Data) { f.base64Data = null; f._b64stripped = true; } });
+    });
+  });
+  return copy;
+}
+
+
+function save() {
+  try {
+    // localStorage에는 base64 파일 제외 (용량 절약) — Drive에는 전체 저장
+    const dbLight = driveAccessToken ? stripBase64ForLocal(db) : db;
+    const serialized = JSON.stringify(dbLight);
+    const kb = Math.round(serialized.length / 1024);
+    localStorage.setItem('mba_hub_v2', serialized);
+    flashSave();
+    if (kb > 3000 && !window._storageWarnShown) {
+      window._storageWarnShown = true;
+      showTranscribeBanner('⚠ 저장 데이터가 ' + Math.round(kb/1024*10)/10 + 'MB입니다. Drive 동기화를 권장합니다.', 'error');
+    }
+  } catch(e) {
+    showTranscribeBanner('⚠ 저장 실패 (용량 초과) — Drive 연동을 사용하세요.', 'error');
+    console.warn('save error', e);
+  }
+  // Drive auto-save (debounced)
+  if (driveAccessToken) {
+    clearTimeout(driveSaveTimer);
+    driveSaveTimer = setTimeout(() => driveSave(), getCFG('driveSaveDelay') * 1000);
+  }
+}
+
+function flashSave() {
+  const el = document.getElementById('saveInd');
+  if (!el) return;
+  clearTimeout(saveTimeout);
+  el.textContent = driveAccessToken ? '✓ 로컬 저장됨' : '✓ 저장됨';
+  el.classList.add('show');
+  saveTimeout = setTimeout(() => { el.textContent = '✓ 저장됨'; el.classList.remove('show'); }, 1800);
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem('mba_hub_v2');
+    if (raw) db = JSON.parse(raw);
+    if (db.courses.length === 0) seedKMB520();
+  } catch(e) {
+    db = { courses: [] };
+    seedKMB520();
+  }
+}
+
+function seedKMB520() {
+  db.courses.push({
+    id: uid(), name: 'KMB 520 마케팅관리', color: '#5b8df6',
+    kbSources: [{ id: uid(), name: 'KMB520 기본 맥락', type: 'text', content: KMB520_KB, ts: nowStr() }],
+    sessions: []
+  });
+  save();
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const nowStr = () => new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+const todayStr = () => new Date().toISOString().slice(0,10);
+const getCourse = id => db.courses.find(c => c.id === id);
+const getSession = (cid, sid) => { const c = getCourse(cid); return c ? c.sessions.find(s => s.id === sid) : null; };
+const activeCourse = () => getCourse(activeCourseId);
+const activeSession = () => getSession(activeCourseId, activeSessionId);
+
+
+function buildSys(extra = '') {
+  const c = activeCourse(), s = activeSession();
+  const kbResult = buildKBContext(c);  // { text, files }
+  const userName = getCFG('userName') || 'Khoon';
+  const userOrg  = getCFG('userOrg') ? ` (${getCFG('userOrg')})` : ' (고려대 KMBA)';
+  const style = getCFG('aiStyle');
+  const styleLine = style === 'concise' ? '응답은 2~3문장 이내로 핵심만.' : style === 'detailed' ? '응답은 충분히 상세하게.' : '응답은 3~5문장 이내로 핵심 위주로.';
+
+  // 이 세션의 인사이트 요약 (최근 3개) → 시스템 프롬프트에 포함
+  let insightCtx = '';
+  if (s && s.insights && s.insights.length > 0) {
+    const recent = s.insights.slice(-3).map(ins => `[${ins.type.toUpperCase()}] ${ins.title}: ${ins.body}`).join(' | ');
+    insightCtx = '\n\n[Session Insights]\n' + recent
+  }
+
+  const sysText = `당신은 ${userName}${userOrg} 학생의 학습 어시스턴트입니다.
+과목: ${c ? c.name : '미선택'} | 세션: ${s ? s.title : '미선택'}${kbResult.text}${insightCtx}
+${extra}
+${styleLine} 이전 대화 맥락을 참고하여 일관성 있게 한국어로 응답.`;
+  return { text: sysText, files: kbResult.files };
+}
+
+function getSessionText(scope = 'session') {
+  if (scope === 'course') {
+    const c = activeCourse();
+    return c ? c.sessions.map(s => `[${s.title}]\n${s.segments.map(sg => sg.text).join(' ')}`).join('\n\n') : '';
+  }
+  const s = activeSession();
+  return s ? s.segments.map(sg => sg.text).join(' ') : '';
+}
+
+// ═══════════════════════════════════════
+// MODEL
+// ═══════════════════════════════════════
+function setModel(m) {
+  currentModel = m;
+  document.getElementById('mHaiku').className  = 'mopt'         + (m === 'haiku'  ? ' on haiku'  : '');
+  document.getElementById('mSonnet').className = 'mopt sonnet'  + (m === 'sonnet' ? ' on' : '');
+  document.getElementById('mOpus').className   = 'mopt opus'    + (m === 'opus'   ? ' on' : '');
+}
+
+// ═══════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════
+function renderAll() {
+  renderCourses();
+  renderSessions();
+  renderTranscript();
+  renderRight();
+  updateFooter();
+  syncRecBtn();
+}
+
+function fmtDuration(secs) {
+  if (!secs) return '';
+  if (secs < 60) return secs + '초';
+  const m = Math.floor(secs / 60), s = secs % 60;
+  return m + '분' + (s ? ' ' + s + '초' : '');
+}
+function fmtChars(segments) {
+  if (!segments || !segments.length) return '';
+  const total = segments.filter(sg => !sg.isSep).reduce((a, sg) => a + (sg.text || '').length, 0);
+  if (!total) return '';
+  if (total >= 1000) return Math.round(total / 100) / 10 + 'K자';
+  return total + '자';
+}
+function fmtSessionInfo(s) {
+  const t = fmtDuration(s.totalSeconds);
+  const c = fmtChars(s.segments);
+  if (t && c) return t + ' · ' + c;
+  if (t) return t;
+  if (c) return c;
+  return '0자';
+}
+
+
+function renderCourses() {
+  const el = document.getElementById('courseList');
+  if (!db.courses.length) {
+    el.innerHTML = '<div class="empty" style="padding:14px;flex:none"><div class="et" style="font-size:10px">+ 로 과목 추가</div></div>';
+    return;
+  }
+  el.innerHTML = db.courses.map(c => `
+    <div class="ci${c.id === activeCourseId ? ' active' : ''}" onclick="selectCourse('${c.id}')">
+      <div class="ci-dot" style="background:${c.color}"></div>
+      <div class="ci-name">${c.name}</div>
+      <div class="ci-cnt">${c.sessions.length}</div>
+      <button class="ci-del" onclick="event.stopPropagation();deleteCourse('${c.id}')" title="과목 삭제">✕</button>
+    </div>`).join('');
+  document.getElementById('fC').textContent = db.courses.length;
+}
+
+function renderSessions() {
+  const el = document.getElementById('sessionList');
+  const c = activeCourse();
+  if (!c) { el.innerHTML = '<div class="empty" style="padding:12px;flex:none"><div class="et" style="font-size:10px">과목을 선택하세요</div></div>'; return; }
+  if (!c.sessions.length) { el.innerHTML = '<div class="empty" style="padding:12px;flex:none"><div class="et" style="font-size:10px">새 세션을 추가하세요</div></div>'; return; }
+  el.innerHTML = [...c.sessions].reverse().map(s => `
+    <div class="si${s.id === activeSessionId ? ' active' : ''}" onclick="selectSession('${s.id}')">
+      <div class="si-t">${s.title}</div>
+      <div class="si-m">
+        <div class="si-d">${s.date || ''}</div>
+        <div class="si-badge ${s.type === 'live' ? 'sb-live' : 'sb-text'}">${s.type === 'live' ? '녹음' : '텍스트'}</div>
+        <div class="si-d">${fmtSessionInfo(s)}</div>
+        <button class="si-edit" onclick="event.stopPropagation();renameSession('${s.id}')" title="세션명 수정">✎</button>
+        <button class="si-del" onclick="event.stopPropagation();deleteSession('${s.id}')" title="세션 삭제">✕</button>
+      </div>
+    </div>`).join('');
+  const total = db.courses.reduce((a, c) => a + c.sessions.length, 0);
+  document.getElementById('fS').textContent = total;
+}
+
+function renderTranscript() {
+  const scroll = document.getElementById('txScroll');
+  const s = activeSession();
+  const hasSession = !!s;
+  document.getElementById('binsBtn').disabled = !hasSession || s.segments.length < 2;
+  document.getElementById('baskBtn').disabled = !hasSession;
+  document.getElementById('examBtn').disabled = !hasSession;
+  document.getElementById('hwBtn').disabled = !hasSession;
+
+  // Update header title
+  const titleEl = document.getElementById('txHdrTitle');
+  if (titleEl) titleEl.textContent = s ? s.title : '트랜스크립트';
+
+  if (!s) {
+    scroll.innerHTML = '<div class="empty" id="txEmpty"><div class="ei">📝</div><div class="et">세션을 선택하거나 새 녹음을 시작하세요</div></div>';
+    return;
+  }
+  let segIdx = 0;
+  scroll.innerHTML = s.segments.map(sg => {
+    if (sg.isSep) {
+      return `<div class="rec-chunk-sep">${sg.text}</div>`;
+    }
+    segIdx++;
+    return `<div class="seg"><span class="seg-n">${String(segIdx).padStart(3,'0')}</span><span class="seg-ts">${sg.ts}</span>${sg.text}</div>`;
+  }).join('');
+  scroll.scrollTop = scroll.scrollHeight;
+}
+
+function renderRight() {
+  const s = activeSession();
+  // insights
+  const ip = document.getElementById('pane-ins');
+  document.getElementById('insEmpty')?.remove();
+  const insItems = s && s.insights.length ? [...s.insights].reverse().map(renderInsCard).join('') : '';
+  if (insItems) ip.innerHTML = insItems;
+  else ip.innerHTML = '<div class="empty" id="insEmpty"><div class="ei">💡</div><div class="et">인사이트 요청 시 결과가 자동 저장됩니다</div></div>';
+  document.getElementById('cntIns').textContent = s ? s.insights.length : 0;
+  // qa
+  const qp = document.getElementById('pane-qa');
+  const qaItems = s && s.qas.length ? [...s.qas].reverse().map(renderQaCard).join('') : '';
+  if (qaItems) qp.innerHTML = qaItems;
+  else qp.innerHTML = '<div class="empty" id="qaEmpty"><div class="ei">🙋</div><div class="et">질문 답변이 자동 저장됩니다</div></div>';
+  document.getElementById('cntQa').textContent = s ? s.qas.length : 0;
+  // kb
+  if (document.getElementById('pane-kb')?.classList.contains('show')) renderKBDashboard();
+  // clear exam/hw results on session change
+  document.getElementById('examResults').innerHTML = '';
+  document.getElementById('hwResults').innerHTML = '';
+  updateFooter();
+}
+
+function renderInsCard(ins) {
+  const tm = {key:['ct-key','핵심'],warn:['ct-warn','주의'],new:['ct-new','신규']};
+  const [cls,lbl] = tm[ins.type] || tm.key;
+  return `<div class="card"><div class="card-hdr"><div class="ct ${cls}">${lbl}</div><div class="card-title">${ins.title||''}</div><div class="card-ts">${ins.ts}</div></div><div class="card-body">${ins.body.split('\n').filter(l=>l.trim()).map(l=>`<p>${l}</p>`).join('')}</div></div>`;
+}
+
+function renderQaCard(qa) {
+  return `<div class="card"><div class="card-hdr"><div class="ct ct-qa">Q&A</div><div class="card-title" style="font-size:10px;color:var(--tx2)">${qa.q.length>55?qa.q.slice(0,55)+'…':qa.q}</div><div class="card-ts">${qa.ts}</div></div><div class="card-body">${qa.a.split('\n').filter(l=>l.trim()).map(l=>`<p>${l}</p>`).join('')}</div></div>`;
+}
+
+
+function updateFooter() {
+  let ti = 0, tq = 0;
+  db.courses.forEach(c => c.sessions.forEach(s => { ti += s.insights.length; tq += s.qas.length; }));
+  document.getElementById('fI').textContent = ti;
+  document.getElementById('fQ').textContent = tq;
+}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function selectCourse(id) {
+  stopRec();
+  activeCourseId = id;
+  activeSessionId = null;
+  const c = getCourse(id);
+  if (c) {
+    document.documentElement.style.setProperty('--cur', c.color);
+    document.getElementById('topCourse').textContent = c.name;
+    document.getElementById('topSession').textContent = '';
+    if (c.sessions.length) selectSession(c.sessions[c.sessions.length - 1].id);
+  }
+  renderAll();
+}
+
+function selectSession(id) {
+  activeSessionId = id;
+  const s = activeSession();
+  if (s) document.getElementById('topSession').textContent = s.title;
+  renderTranscript();
+  renderRight();
+  switchRTab('ins');
+}
+
+// ═══════════════════════════════════════
+// COURSE CRUD
+// ═══════════════════════════════════════
+function buildCPick(sel) {
+  selColor = sel;
+  document.getElementById('cpick').innerHTML = COLORS.map(c =>
+    `<div class="cpdot${c===sel?' on':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`
+  ).join('');
+}
+function pickColor(c) { selColor = c; buildCPick(c); }
+
+function openAddCourse() {
+  editingCourse = null;
+  document.getElementById('acTitle').textContent = '새 과목 추가';
+  document.getElementById('cName').value = '';
+  document.getElementById('cKB').value = '';
+  buildCPick(COLORS[db.courses.length % COLORS.length]);
+  openModal('addCourseModal');
+  setTimeout(() => document.getElementById('cName').focus(), 100);
+}
+
+function isDupCourseName(name, excludeId) {
+  return db.courses.some(c => c.name.trim() === name.trim() && c.id !== excludeId);
+}
+function isDupSessionTitle(courseId, title, excludeId) {
+  const c = db.courses.find(c => c.id === courseId);
+  if (!c) return false;
+  return c.sessions.some(s => s.title.trim() === title.trim() && s.id !== excludeId);
+}
+
+
+function saveCourse() {
+  const name = document.getElementById('cName').value.trim();
+  if (!name) return;
+  if (isDupCourseName(name, editingCourse ? editingCourse.id : null)) {
+    alert('같은 이름의 과목이 이미 있습니다: "' + name + '"');
+    return;
+  }
+  const kb = document.getElementById('cKB').value.trim();
+  if (editingCourse) {
+    editingCourse.name = name;
+    editingCourse.color = selColor;
+    if (kb) {
+      const existing = editingCourse.kbSources.find(s => s.name === '초기 KB');
+      if (existing) existing.content = kb;
+      else editingCourse.kbSources.push({ id: uid(), name: '초기 KB', type: 'text', content: kb, ts: nowStr() });
+    }
+  } else {
+    const course = {
+      id: uid(), name, color: selColor, sessions: [],
+      kbSources: kb ? [{ id: uid(), name: '초기 KB', type: 'text', content: kb, ts: nowStr() }] : []
+    };
+    db.courses.push(course);
+    activeCourseId = course.id;
+    document.documentElement.style.setProperty('--cur', course.color);
+    document.getElementById('topCourse').textContent = course.name;
+  }
+  save(); closeModal('addCourseModal'); renderAll();
+}
+
+// ═══════════════════════════════════════
+// SESSION CRUD
+// ═══════════════════════════════════════
+function newLive() {
+  if (!activeCourseId) { alert('과목을 먼저 선택하세요.'); return; }
+  if (isRecording) stopRec();
+  const c = activeCourse();
+  const n = c.sessions.filter(s => s.type === 'live').length + 1;
+  const defaultTitle = `${c.name} ${n}차 강의`;
+  // Open naming modal
+  openLiveNameModal(defaultTitle, function(title) {
+    const s = { id: uid(), title, date: todayStr(), type: 'live', segments: [], insights: [], qas: [] };
+    c.sessions.push(s); save();
+    selectSession(s.id); renderSessions();
+    setTimeout(() => toggleRec(), 100);
+  });
+}
+
+function openNewText() {
+  if (!activeCourseId) { alert('과목을 먼저 선택하세요.'); return; }
+  const c = activeCourse();
+  const n = c.sessions.filter(s => s.type === 'text').length + 1;
+  document.getElementById('tsTitle').value = `${c.name} ${n}차 텍스트`;
+  document.getElementById('tsDate').value = todayStr();
+  document.getElementById('tsContent').value = '';
+  openModal('textSessModal');
+  setTimeout(() => document.getElementById('tsTitle').focus(), 100);
+}
+
+function saveTextSess() {
+  const title = document.getElementById('tsTitle').value.trim();
+  const date = document.getElementById('tsDate').value;
+  const content = document.getElementById('tsContent').value.trim();
+  if (!title || !content) { alert('제목과 내용을 입력하세요.'); return; }
+  if (isDupSessionTitle(activeCourseId, title, null)) {
+    alert('같은 이름의 세션이 이미 있습니다: "' + title + '"');
+    return;
+  }
+  const segs = content.split(/\n{2,}|\n/).filter(l => l.trim().length > 2)
+    .map((text, i) => ({ text: text.trim(), ts: String(i + 1).padStart(3, '0') }));
+  const s = { id: uid(), title, date, type: 'text', segments: segs, insights: [], qas: [] };
+  activeCourse().sessions.push(s); save();
+  closeModal('textSessModal'); selectSession(s.id); renderSessions();
+}
+
+// ═══════════════════════════════════════
+// KNOWLEDGE BASE
+// ═══════════════════════════════════════
+function addKBText() {
+  const content = document.getElementById('kbPaste').value.trim();
+  const name = document.getElementById('kbSrcName').value.trim() || `메모 ${nowStr()}`;
+  if (!content) { alert('내용을 입력하세요.'); return; }
+  const c = activeCourse();
+  if (!c) { alert('과목을 먼저 선택하세요.'); return; }
+  if (!c.kbSources) c.kbSources = [];
+  c.kbSources.push({ id: uid(), name, type: 'text', content, ts: nowStr() });
+  save(); renderKB();
+  document.getElementById('kbPaste').value = '';
+  document.getElementById('kbSrcName').value = '';
+}
+
+
+function delKBSrc(id) {
+  const c = activeCourse(); if (!c) return;
+  c.kbSources = c.kbSources.filter(s => s.id !== id);
+  save(); renderKB();
+}
+
+// ═══════════════════════════════════════
+// RECORDING (STT)
+// ═══════════════════════════════════════
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null, isRecording = false, recSeconds = 0, recTimer = null, interimEl = null;
+let mediaRecorder = null, audioChunks = [];
+const WAVE_N = 18;
+
+(function() {
+  const row = document.getElementById('waveRow');
+  for (let i = 0; i < WAVE_N; i++) { const b = document.createElement('div'); b.className = 'wb'; b.style.height = '4px'; row.appendChild(b); }
+})();
+let waveAnim = null;
+function animWave(on) {
+  const bars = document.querySelectorAll('.wb');
+  if (on) { bars.forEach(b => b.classList.add('on')); waveAnim = setInterval(() => bars.forEach(b => { b.style.height = (4 + Math.random() * 16) + 'px'; }), 80); }
+  else { clearInterval(waveAnim); bars.forEach(b => { b.style.height = '4px'; b.classList.remove('on'); }); }
+}
+
+if (SR) {
+  recognition = new SR();
+  recognition.lang = getCFG('recLang'); recognition.continuous = true; recognition.interimResults = true;
+  recognition.onresult = e => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const r = e.results[i];
+      if (r.isFinal) {
+        const txt = r[0].transcript.trim();
+        if (txt.length > getCFG('minSegLen')) {
+          const s = activeSession();
+          if (s) {
+            s.segments.push({ text: txt, ts: nowStr() });
+            save(); // AUTO-SAVE every segment
+            appendSeg(txt, nowStr(), s.segments.length);
+            document.getElementById('binsBtn').disabled = s.segments.length < 2;
+          }
+        }
+        interimEl?.remove(); interimEl = null;
+      } else interim += r[0].transcript;
+    }
+    if (interim) showInterim(interim);
+  };
+  recognition.onerror = () => {};
+  recognition.onend = () => { if (isRecording) recognition.start(); };
+}
+
+function syncRecBtn() {
+  const btn  = document.getElementById('recBtn');
+  const lbl  = document.getElementById('recLabel');
+  const td   = document.getElementById('timerD');
+  const pill = document.getElementById('livePill');
+  if (isRecording) {
+    btn.className = 'rec-btn on'; lbl.textContent = '녹음 중지';
+    td.classList.add('on');
+    if (pill) pill.classList.add('show');
+  } else {
+    btn.className = 'rec-btn off'; lbl.textContent = '녹음 시작';
+    td.classList.remove('on');
+    if (pill) pill.classList.remove('show');
+  }
+}
+
+function toggleRec() {
+  if (!recognition) { alert('Chrome을 사용해주세요.'); return; }
+  if (!activeSessionId) { alert('세션을 먼저 선택하세요.'); return; }
+  const s = activeSession();
+  if (s && s.type !== 'live') { alert('녹음 세션이 아닙니다.'); return; }
+  isRecording = !isRecording;
+  const btn = document.getElementById('recBtn'), lbl = document.getElementById('recLabel'), td = document.getElementById('timerD');
+  if (isRecording) {
+    recognition.start();
+    btn.className = 'rec-btn on'; lbl.textContent = '녹음 중지';
+    resetAutoInsight();
+    td.classList.add('on'); document.getElementById('livePill').classList.add('show');
+    document.getElementById('txEmpty')?.remove();
+    animWave(true); recSeconds = 0;
+    // 이미 내용이 있는 세션에서 재녹음 시 구분선 자동 삽입
+    const _s = activeSession();
+    if (_s && _s.segments && _s.segments.length > 0 && !_s.segments[_s.segments.length-1].isSep) {
+      _s.segments.push({ text: '── 녹음 재시작 ' + nowStr() + ' ──', ts: 'SEP', isSep: true });
+      save(); renderTranscript();
+    }
+    recTimer = setInterval(() => {
+      recSeconds++;
+      td.textContent = String(Math.floor(recSeconds / 60)).padStart(2, '0') + ':' + String(recSeconds % 60).padStart(2, '0');
+    }, 1000);
+    document.getElementById('baskBtn').disabled = false;
+    // Start MediaRecorder for Gemini full transcription
+    audioChunks = [];
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+      mediaRecorder.start(1000);
+    }).catch(() => {}); // silently ignore if mic permission denied for MediaRecorder
+  } else {
+    recognition.stop(); clearInterval(recTimer); clearInterval(autoInsightTimer);
+    btn.className = 'rec-btn off'; lbl.textContent = '녹음 시작';
+    td.classList.remove('on'); td.textContent = '00:00';
+    document.getElementById('livePill').classList.remove('show');
+    animWave(false);
+    // 녹음 시간 세션에 누적 저장
+    const _rs = activeSession();
+    if (_rs && recSeconds > 0) {
+      _rs.totalSeconds = (_rs.totalSeconds || 0) + recSeconds;
+      save(); renderSessions();
+    }
+    // Stop MediaRecorder and trigger Gemini transcription
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      const capturedSessionId = activeSessionId; // capture NOW before any async change
+      const capturedCourseId  = activeCourseId;
+      mediaRecorder.onstop = () => {
+        mediaRecorder.stream.getTracks().forEach(t => t.stop());
+        if (getCFG('autoTranscribe') && audioChunks.length > 0) {
+          const blob = new Blob(audioChunks, { type: 'audio/webm' });
+          transcribeWithGemini(blob, capturedSessionId, capturedCourseId);
+        }
+        audioChunks = [];
+      };
+      mediaRecorder.stop();
+    }
+  }
+}
+
+function stopRec() { if (isRecording) toggleRec(); }
+
+function appendSeg(text, ts, idx) {
+  const scroll = document.getElementById('txScroll');
+  const d = document.createElement('div'); d.className = 'seg cur';
+  d.innerHTML = `<span class="seg-n">${String(idx).padStart(3,'0')}</span><span class="seg-ts">${ts}</span>${text}`;
+  scroll.appendChild(d);
+  setTimeout(() => d.classList.remove('cur'), 2000);
+  scroll.scrollTop = scroll.scrollHeight;
+}
+
+function showInterim(text) {
+  if (!interimEl) { interimEl = document.createElement('div'); interimEl.className = 'seg interim'; document.getElementById('txScroll').appendChild(interimEl); }
+  interimEl.textContent = text;
+  document.getElementById('txScroll').scrollTop = 999999;
+}
+
+// ═══════════════════════════════════════
+// GEMINI TRANSCRIPTION
+// ═══════════════════════════════════════
+async function transcribeWithGemini(audioBlob, sessionId, courseId) {
+  if (!navigator.onLine) {
+    showTranscribeBanner('⚠ 오프라인 — Gemini 변환 불가. 실시간 텍스트가 저장됩니다.', 'error');
+    save();
+    return;
+  }
+  const geminiKey = getGeminiKey();
+  // geminiKey optional — Vercel proxy uses server-side GEMINI_KEY if empty
+
+  const cid = courseId || activeCourseId;
+  const session = getSession(cid, sessionId);
+  if (!session) return;
+
+  // Show progress banner
+  showTranscribeBanner('🔄 Gemini 전체 변환 중... (음성 파일 업로드)', 'progress', 10);
+
+  try {
+    // Convert blob to base64
+    const arrayBuf = await audioBlob.arrayBuffer();
+    const uint8 = new Uint8Array(arrayBuf);
+    let binary = '';
+    uint8.forEach(b => binary += String.fromCharCode(b));
+    const base64Audio = btoa(binary);
+
+    showTranscribeBanner('🔄 Gemini 분석 중...', 'progress', 50);
+
+    const model = getGeminiModel();
+    // Use Vercel proxy if no direct key; fallback to direct call if key present
+    const useProxy = !geminiKey;
+    const geminiUrl = useProxy
+      ? '/api/gemini-proxy'
+      : `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
+
+    const geminiBody = {
+      contents: [{
+        parts: [
+          { text: '다음 강의 녹음을 한국어로 정확하게 전사해주세요. 말한 내용을 그대로, 문단 단위로 나누어 출력하세요. 설명이나 요약 없이 전사 내용만 출력하세요.' },
+          { inline_data: { mime_type: audioBlob.type || 'audio/webm', data: base64Audio } }
+        ]
+      }],
+      generationConfig: { temperature: 0 }
+    };
+    if (useProxy) geminiBody.model = model; // proxy needs model in body
+
+    const resp = await fetch(geminiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(geminiBody)
+    });
+
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const fullText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!fullText.trim()) throw new Error('변환 결과가 비어있습니다');
+
+    // Save realtime segments as backup
+    session.realtimeSegments = [...(session.segments || [])];
+
+    // Replace with Gemini full transcription
+    const lines = fullText.split(/[\n]+/).filter(l => l.trim().length > 2);
+    const newSegs = lines.map((text, i) => ({ text: text.trim(), ts: '전체변환-' + String(i+1).padStart(3,'0') }));
+
+    if (newSegs.length > 0) {
+      session.segments = newSegs;
+      session.fullTranscript = fullText;
+      save();
+      renderTranscript();
+    }
+
+    showTranscribeBanner(`✅ 변환 완료 — ${newSegs.length}개 문단 저장됨`, 'done', 100);
+
+  } catch(e) {
+    // On failure, keep realtime segments untouched
+    save();
+    showTranscribeBanner('⚠ 변환 실패: ' + e.message + ' (실시간 텍스트 보존됨)', 'error', 100);
+  }
+}
+
+function showTranscribeBanner(msg, type, pct) {
+  // Cancel any pending auto-dismiss
+  if (window._bannerTimer) { clearTimeout(window._bannerTimer); window._bannerTimer = null; }
+
+  let banner = document.getElementById('transcribeBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'transcribeBanner';
+    banner.style.cssText = 'position:fixed;bottom:50px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:10px 16px;font-size:11px;font-family:var(--sans);z-index:200;min-width:320px;max-width:500px;display:flex;flex-direction:column;gap:7px;box-shadow:0 4px 24px rgba(0,0,0,.5);cursor:pointer';
+    banner.title = '클릭하면 닫힙니다';
+    banner.onclick = () => hidTranscribeBanner();
+    document.body.appendChild(banner);
+  }
+  const color = type === 'error' ? 'var(--red)' : type === 'done' ? 'var(--ins)' : 'var(--c5)';
+  const borderColor = type === 'error' ? 'rgba(239,68,68,.5)' : type === 'done' ? 'rgba(16,185,129,.5)' : 'rgba(6,182,212,.4)';
+  banner.style.borderColor = borderColor;
+
+  const closable = type === 'error' || type === 'done';
+  banner.innerHTML =
+    '<div style="display:flex;align-items:flex-start;gap:8px">'
+    + '<div style="color:'+color+';font-weight:500;flex:1;line-height:1.5">'+msg+'</div>'
+    + (closable ? '<div style="color:var(--tx3);font-size:14px;line-height:1;flex-shrink:0;margin-top:1px">✕</div>' : '')
+    + '</div>'
+    + (pct !== undefined
+        ? '<div style="height:3px;background:var(--b2);border-radius:2px"><div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:2px;transition:width .3s"></div></div>'
+        : '')
+    + (closable ? '<div style="font-size:9px;color:var(--tx3)">클릭하면 닫힙니다</div>' : '');
+
+  // Auto-dismiss only for "done", not for errors
+  if (type === 'done') {
+    window._bannerTimer = setTimeout(() => hidTranscribeBanner(), 5000);
+  }
+  // errors stay until clicked
+}
+
+function hidTranscribeBanner() {
+  if (window._bannerTimer) { clearTimeout(window._bannerTimer); window._bannerTimer = null; }
+  const b = document.getElementById('transcribeBanner');
+  if (b) b.remove();
+}
+
+// ═══════════════════════════════════════
+// AI API
+// ═══════════════════════════════════════
+async function callClaude(system, userMsg, fileParts, extraMessages) {
+  // 오프라인 체크
+  if (!navigator.onLine) {
+    throw new Error('인터넷 연결이 없습니다. 네트워크를 확인해주세요.');
+  }
+  // system: string
+  // userMsg: string (최신 사용자 메시지)
+  // fileParts: [{base64Data, mimeType}] — PDF/이미지 첨부
+  // extraMessages: [{role:'user'|'assistant', content:string}] — 이전 대화 히스토리
+
+  // Build final user content (files + text)
+  let finalContent;
+  if (fileParts && fileParts.length > 0) {
+    finalContent = [];
+    fileParts.forEach(function(f) {
+      if (f.mimeType === 'application/pdf') {
+        finalContent.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: f.base64Data } });
+      } else if (f.mimeType && f.mimeType.startsWith('image/')) {
+        finalContent.push({ type: 'image', source: { type: 'base64', media_type: f.mimeType, data: f.base64Data } });
+      }
+    });
+    finalContent.push({ type: 'text', text: userMsg });
+  } else {
+    finalContent = userMsg;
+  }
+
+  // Build messages array: [히스토리...] + 현재 질문
+  const messages = [];
+  if (extraMessages && extraMessages.length > 0) {
+    extraMessages.forEach(function(m) { messages.push(m); });
+  }
+  messages.push({ role: 'user', content: finalContent });
+
+  const res = await fetch('/api/proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: MODELS[currentModel], max_tokens: getCFG('maxTokens'), system, messages })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content[0].text;
+}
+
+// ── CONVERSATION HISTORY BUILDER ──
+function buildHistory(s, maxPairs) {
+  // s: activeSession()
+  // 최근 인사이트 + Q&A를 대화 히스토리로 변환
+  // 너무 길면 토큰 과부하 → 최근 N쌍만 포함
+  if (!s) return [];
+  const limit = maxPairs || 10;
+  const history = [];
+
+  // Q&A 히스토리 (가장 중요 — 실제 대화 맥락)
+  const recentQas = s.qas.slice(-limit);
+  recentQas.forEach(function(qa) {
+    history.push({ role: 'user',      content: qa.q });
+    history.push({ role: 'assistant', content: qa.a });
+  });
+
+  // 인사이트는 assistant 발화로 맨 앞에 요약 형태로 추가
+  // (너무 많으면 생략, 최근 3개만)
+  if (s.insights.length > 0) {
+    const insightSummary = s.insights.slice(-3)
+      .map(function(ins) { return '[' + ins.type.toUpperCase() + '] ' + ins.title + ': ' + ins.body; })
+      .join(' | ');
+    // prepend as context note in system — handled in buildSys
+  }
+
+  return history;
+}
+
+
+// ── INSIGHT ──
+let isInsGen = false;
+async function requestInsight() {
+  if (isInsGen) return;
+  const s = activeSession();
+  if (!s || s.segments.length < 2) { alert('내용이 더 필요합니다.'); return; }
+  isInsGen = true;
+  const btn = document.getElementById('binsBtn'), lbl = document.getElementById('binsLbl');
+  btn.classList.add('loading'); btn.disabled = true; lbl.textContent = '분석 중…';
+
+  const pane = document.getElementById('pane-ins');
+  document.getElementById('insEmpty')?.remove();
+  const gid = 'gi' + Date.now();
+  const gel = document.createElement('div'); gel.className = 'gen-card'; gel.id = gid;
+  gel.innerHTML = `<div class="gdots"><span></span><span></span><span></span></div><div class="gtext">인사이트 분석 중…</div>`;
+  pane.prepend(gel); switchRTab('ins');
+
+  try {
+    const _sysi = buildSys('반드시 JSON만 반환: {"type":"key|warn|new","title":"15자이내","body":"3~5문장"}');
+    const ans = await callClaude(
+      _sysi.text,
+      `강의 내용:\n${getSessionText().slice(-getCFG('ctxInsight'))}\n\n핵심 인사이트 JSON으로.`,
+      _sysi.files
+    );
+    const parsed = JSON.parse(ans.replace(/```json|```/g, '').trim());
+    document.getElementById(gid)?.remove();
+    const ins = { id: uid(), type: parsed.type || 'key', title: parsed.title || '인사이트', body: parsed.body || '', ts: nowStr() };
+    s.insights.push(ins);
+    save(); // AUTO-SAVE
+    document.getElementById('cntIns').textContent = s.insights.length;
+    updateFooter();
+    const card = document.createElement('div'); card.className = 'card fresh';
+    card.innerHTML = renderInsCard(ins);
+    pane.prepend(card);
+    setTimeout(() => card.classList.remove('fresh'), 3000);
+  } catch(e) {
+    document.getElementById(gid)?.remove();
+    const ec = document.createElement('div'); ec.className = 'gen-card';
+    ec.innerHTML = `<div class="gtext" style="color:var(--red)">⚠ ${e.message}</div>`;
+    pane.prepend(ec);
+  }
+  isInsGen = false; btn.classList.remove('loading'); btn.disabled = false; lbl.textContent = '💡 인사이트 요청';
+}
+
+// ── Q&A ──
+let isQaGen = false;
+async function askQ() {
+  if (isQaGen) return;
+  const inp = document.getElementById('qin'), q = inp.value.trim();
+  if (!q) return;
+  inp.value = ''; isQaGen = true;
+
+  const s = activeSession();
+  const pane = document.getElementById('pane-qa');
+  document.getElementById('qaEmpty')?.remove();
+  const gid = 'gq' + Date.now();
+  const gel = document.createElement('div'); gel.className = 'gen-card'; gel.id = gid;
+  gel.innerHTML = `<div class="gdots"><span></span><span></span><span></span></div><div class="gtext">답변 생성 중…</div>`;
+  pane.prepend(gel); switchRTab('qa');
+
+  const txCtx = getSessionText();
+  const lectureSection = txCtx.length > 5 ? `\n\n[오늘 강의 내용]\n${txCtx.slice(-getCFG('ctxQa'))}` : '';
+  try {
+    const _sysq = buildSys('강의 내용과 이전 대화 맥락을 우선 활용. 불확실 시 "~로 볼 수 있습니다".');
+    const history = buildHistory(s, 8); // 최근 8쌍 대화 포함
+    const ans = await callClaude(
+      _sysq.text,
+      `질문: "${q}"${lectureSection}\n\n답변해주세요.`,
+      _sysq.files,
+      history
+    );
+    document.getElementById(gid)?.remove();
+    const qa = { id: uid(), q, a: ans, ts: nowStr() };
+    if (s) { s.qas.push(qa); save(); } // AUTO-SAVE
+    document.getElementById('cntQa').textContent = s ? s.qas.length : 0;
+    updateFooter();
+    const card = document.createElement('div'); card.className = 'card fresh';
+    card.innerHTML = renderQaCard(qa);
+    pane.prepend(card);
+    setTimeout(() => card.classList.remove('fresh'), 3000);
+  } catch(e) {
+    document.getElementById(gid)?.remove();
+    const ec = document.createElement('div'); ec.className = 'card';
+    ec.innerHTML = `<div class="card-body" style="color:var(--red)">⚠ ${e.message}</div>`;
+    pane.prepend(ec);
+  }
+  isQaGen = false;
+}
+
+// ── EXAM ──
+async function runExam() {
+  const btn = document.getElementById('examBtn');
+  btn.disabled = true; btn.textContent = '생성 중…';
+  const scope = document.getElementById('examScope').value;
+  const hint = document.getElementById('examHint').value.trim();
+  const results = document.getElementById('examResults');
+  const gid = 'ge' + Date.now();
+  const gel = document.createElement('div'); gel.className = 'gen-card'; gel.id = gid;
+  gel.innerHTML = `<div class="gdots"><span></span><span></span><span></span></div><div class="gtext">예상 문제 생성 중…</div>`;
+  results.prepend(gel);
+  try {
+    const _syse = buildSys('MBA 시험 예상 문제 전문가. 논술형/단답형/사례적용형 혼합 5~8문제. 각 문제 아래 답변 키워드 제시. 이전 Q&A에서 다룬 내용도 반영.');
+    const examHistory = buildHistory(activeSession(), 5);
+    const ans = await callClaude(
+      _syse.text,
+      `강의 내용:\n${getSessionText(scope).slice(-getCFG('ctxExam'))}\n추가 힌트: ${hint||'없음'}\n\n예상 문제 생성.`,
+      _syse.files,
+      examHistory
+    );
+    document.getElementById(gid)?.remove();
+    const card = document.createElement('div'); card.className = 'card fresh';
+    card.innerHTML = `<div class="card-hdr"><div class="ct ct-exam">시험준비</div><div class="card-title">예상 문제</div><div class="card-ts">${nowStr()}</div></div><div class="card-body">${ans.split('\n').filter(l=>l.trim()).map(l=>`<p>${l}</p>`).join('')}</div>`;
+    results.prepend(card);
+    setTimeout(() => card.classList.remove('fresh'), 3000);
+  } catch(e) {
+    document.getElementById(gid)?.remove();
+    results.innerHTML = `<div class="gen-card"><div class="gtext" style="color:var(--red)">⚠ ${e.message}</div></div>`;
+  }
+  btn.disabled = false; btn.textContent = '예상 문제 생성';
+}
+
+// ── HW ──
+async function runHw() {
+  const topic = document.getElementById('hwTopic').value.trim();
+  if (!topic) { alert('주제를 입력하세요.'); return; }
+  const btn = document.getElementById('hwBtn');
+  btn.disabled = true; btn.textContent = '생성 중…';
+  const scope = document.getElementById('hwScope').value;
+  const results = document.getElementById('hwResults');
+  const gid = 'gh' + Date.now();
+  const gel = document.createElement('div'); gel.className = 'gen-card'; gel.id = gid;
+  gel.innerHTML = `<div class="gdots"><span></span><span></span><span></span></div><div class="gtext">과제 아이디어 생성 중…</div>`;
+  results.prepend(gel);
+  try {
+    const _sysh = buildSys('MBA 과제 준비 전문가. 강의 내용 연계 아이디어·논리구조·핵심논거·이론/프레임워크 제시. 이전 Q&A 맥락도 반영.');
+    const hwHistory = buildHistory(activeSession(), 5);
+    const ans = await callClaude(
+      _sysh.text,
+      `과제 주제: "${topic}"\n강의 내용:\n${getSessionText(scope).slice(-getCFG('ctxExam'))}\n\n아이디어와 구조를 제안해주세요.`,
+      _sysh.files,
+      hwHistory
+    );
+    document.getElementById(gid)?.remove();
+    const card = document.createElement('div'); card.className = 'card fresh';
+    card.innerHTML = `<div class="card-hdr"><div class="ct ct-hw">과제준비</div><div class="card-title">${topic.slice(0,40)}</div><div class="card-ts">${nowStr()}</div></div><div class="card-body">${ans.split('\n').filter(l=>l.trim()).map(l=>`<p>${l}</p>`).join('')}</div>`;
+    results.prepend(card);
+    setTimeout(() => card.classList.remove('fresh'), 3000);
+  } catch(e) {
+    document.getElementById(gid)?.remove();
+    results.innerHTML = `<div class="gen-card"><div class="gtext" style="color:var(--red)">⚠ ${e.message}</div></div>`;
+  }
+  btn.disabled = false; btn.textContent = '아이디어 생성';
+}
+
+// ═══════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════
+// ═══ GOOGLE DRIVE ═══
+function setSyncStatus(state, label) {
+  const btn = document.getElementById('driveBtn');
+  const lbl = document.getElementById('driveLbl');
+  btn.className = 'drive-btn' + (state ? ' ' + state : '');
+  lbl.textContent = label;
+  // Also update footer badge
+  const fb = document.getElementById('footerBadge');
+  if (fb) {
+    if (state === 'connected') { fb.textContent = '☁ Drive 연동'; fb.style.background = 'rgba(16,185,129,.1)'; fb.style.borderColor = 'rgba(16,185,129,.2)'; fb.style.color = 'var(--ins)';
+      const si = document.getElementById('saveInd'); if(si){si.textContent='☁ Drive 저장됨'; si.classList.add('show'); setTimeout(()=>{si.textContent='✓ 저장됨';},2000);}
+    }
+    else if (state === 'syncing') { fb.textContent = '↻ 동기화 중'; fb.style.color = 'var(--c5)';
+      const si = document.getElementById('saveInd'); if(si){si.textContent='☁ Drive 저장 중...'; si.classList.add('show');}
+    }
+    else if (state === 'error')   { fb.textContent = '⚠ Drive 오류'; fb.style.color = 'var(--red)'; }
+    else { fb.textContent = '💾 localStorage'; fb.style.color = 'var(--exam)'; }
+  }
+}
+
+function handleGoogleLogin() {
+  if (driveAccessToken) { driveLoad(); return; }
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: DRIVE_CLIENT_ID,
+    scope: DRIVE_SCOPE,
+    callback: async (resp) => {
+      if (resp.error) { setSyncStatus('error', '● 오류'); return; }
+      driveAccessToken = resp.access_token;
+      // 토큰 만료 시각 저장 (1시간)
+      localStorage.setItem('drive_token', resp.access_token);
+      localStorage.setItem('drive_token_exp', Date.now() + 3500 * 1000);
+      setSyncStatus('connected', '● ' + (getCFG('userName') || 'Khoon'));
+      await driveLoad();
+    }
+  });
+  client.requestAccessToken();
+}
+
+function tryAutoReconnectDrive() {
+  // 새로고침 후 저장된 토큰으로 자동 재연결 시도
+  const token = localStorage.getItem('drive_token');
+  const exp   = parseInt(localStorage.getItem('drive_token_exp') || '0');
+  if (token && Date.now() < exp) {
+    driveAccessToken = token;
+    setSyncStatus('connected', '● ' + (getCFG('userName') || 'Khoon'));
+    driveLoad();
+  }
+}
+
+async function driveGetFileId() {
+  const r = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${DRIVE_FILE_NAME}'+and+trashed=false&fields=files(id,name)`, {
+    headers: { Authorization: 'Bearer ' + driveAccessToken }
+  });
+  const d = await r.json();
+  return d.files?.[0]?.id || null;
+}
+
+async function driveLoad() {
+  try {
+    setSyncStatus('syncing', '● 동기화 중...');
+    driveFileId = await driveGetFileId();
+    if (!driveFileId) { setSyncStatus('connected', '● ' + (getCFG('userName') || 'Khoon')); driveSave(); return; }
+    const r = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
+      headers: { Authorization: 'Bearer ' + driveAccessToken }
+    });
+    const remote = await r.json();
+    if (remote.courses) {
+      const localCount  = db.courses.reduce((a,c) => a + c.sessions.length, 0);
+      const remoteCount = remote.courses.reduce((a,c) => a + c.sessions.length, 0);
+      const localOnly   = db.courses.filter(c => !remote.courses.find(r => r.id === c.id)).length;
+
+      // 로컬에 Drive에 없는 데이터가 있을 때만 충돌 안내
+      if (localOnly > 0 && remoteCount > 0) {
+        const msg = 'Drive ' + remote.courses.length + '과목/' + remoteCount + '세션 vs 로컬 ' + db.courses.length + '과목/' + localCount + '세션 | [확인]=병합 [취소]=Drive우선(로컬면적)'; const merge = confirm(msg);
+        if (!merge) {
+          // Drive 우선 — 로컬 교체
+          db = { courses: remote.courses };
+        } else {
+          // 병합
+          remote.courses.forEach(rc => {
+            const local = db.courses.find(c => c.id === rc.id);
+            if (!local) db.courses.push(rc);
+            else {
+              rc.sessions.forEach(rs => {
+                if (!local.sessions.find(s => s.id === rs.id)) local.sessions.push(rs);
+              });
+            }
+          });
+        }
+      } else {
+        // 충돌 없음 — 그냥 병합
+        remote.courses.forEach(rc => {
+          const local = db.courses.find(c => c.id === rc.id);
+          if (!local) db.courses.push(rc);
+          else {
+            rc.sessions.forEach(rs => {
+              if (!local.sessions.find(s => s.id === rs.id)) local.sessions.push(rs);
+            });
+          }
+        });
+      }
+      try { localStorage.setItem('mba_hub_v2', JSON.stringify(db)); } catch(e) {}
+      renderAll();
+    }
+    setSyncStatus('connected', '● ' + (getCFG('userName') || 'Khoon'));
+    updateFooter();
+  } catch(e) {
+    setSyncStatus('error', '● 오류');
+  }
+}
+
+async function driveSave(immediate = false) {
+  if (!driveAccessToken) return;
+  try {
+    setSyncStatus('syncing', '● 저장 중...');
+    if (!driveFileId) driveFileId = await driveGetFileId();
+    const body = JSON.stringify(db);
+    let r;
+    if (driveFileId) {
+      r = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+        method: 'PATCH', headers: { Authorization: 'Bearer ' + driveAccessToken, 'Content-Type': 'application/json' },
+        body
+      });
+    } else {
+      const meta = await fetch('https://www.googleapis.com/drive/v3/files', {
+        method: 'POST', headers: { Authorization: 'Bearer ' + driveAccessToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: DRIVE_FILE_NAME, mimeType: 'application/json' })
+      });
+      const mj = await meta.json();
+      driveFileId = mj.id;
+      r = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+        method: 'PATCH', headers: { Authorization: 'Bearer ' + driveAccessToken, 'Content-Type': 'application/json' },
+        body
+      });
+    }
+    setSyncStatus('connected', '● ' + (getCFG('userName') || 'Khoon'));
+  } catch(e) {
+    setSyncStatus('error', '● 오류');
+    // 토큰 만료 가능성 → 저장된 토큰 제거
+    localStorage.removeItem('drive_token');
+    localStorage.removeItem('drive_token_exp');
+    driveAccessToken = null;
+  }
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `mba-hub-backup-${todayStr()}.json`; a.click();
+}
+function importData(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const imp = JSON.parse(ev.target.result);
+      if (!imp.courses) throw new Error('잘못된 백업 파일입니다.');
+      const impCourses = imp.courses.length;
+      const impSessions = imp.courses.reduce((a, c) => a + c.sessions.length, 0);
+      const choice = window.confirm(
+        `백업 파일: 과목 ${impCourses}개, 세션 ${impSessions}개
+
+` +
+        `[확인] 병합 — 기존 데이터 유지 + 새 데이터 추가
+` +
+        `[취소] 취소`
+      );
+      if (!choice) return;
+      // 병합: id 기준으로 없는 것만 추가
+      let added = 0;
+      imp.courses.forEach(ic => {
+        const existing = db.courses.find(c => c.id === ic.id);
+        if (!existing) {
+          db.courses.push(ic); added++;
+        } else {
+          // 세션도 병합
+          ic.sessions.forEach(is => {
+            if (!existing.sessions.find(s => s.id === is.id)) {
+              existing.sessions.push(is); added++;
+            }
+          });
+        }
+      });
+      save(); renderAll();
+      showTranscribeBanner('✅ 불러오기 완료 — ' + added + '개 항목 추가됨', 'done');
+    } catch(err) {
+      showTranscribeBanner('⚠ 파일 오류: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file); e.target.value = '';
+}
+
+
+// ═══════════════════════════════════════
+// SESSION RENAME
+// ═══════════════════════════════════════
+function openLiveNameModal(defaultTitle, onConfirm) {
+  document.getElementById('liveNameInput').value = defaultTitle;
+  document.getElementById('liveNameModal').dataset.cb = '';
+  window._liveNameCb = onConfirm;
+  openModal('liveNameModal');
+  setTimeout(() => {
+    const inp = document.getElementById('liveNameInput');
+    inp.focus(); inp.select();
+  }, 100);
+}
+
+function confirmLiveName() {
+  const title = document.getElementById('liveNameInput').value.trim();
+  if (!title) return;
+  // 세션 이름 지정 시 중복 체크 (이름 변경 시엔 현재 세션 제외)
+  const excludeId = window._liveNameEditId || null;
+  if (isDupSessionTitle(activeCourseId, title, excludeId)) {
+    alert('같은 이름의 세션이 이미 있습니다: "' + title + '"\n다른 이름을 입력해주세요.');
+    return; // 모달 유지
+  }
+  closeModal('liveNameModal');
+  window._liveNameEditId = null;
+  if (window._liveNameCb) { window._liveNameCb(title); window._liveNameCb = null; }
+}
+
+function renameSession(id) {
+  const c = activeCourse(); if (!c) return;
+  const s = c.sessions.find(s => s.id === id); if (!s) return;
+  window._liveNameEditId = id; // 중복 체크 시 자기 자신 제외
+  openLiveNameModal(s.title, function(newTitle) {
+    s.title = newTitle; save();
+    renderSessions();
+    if (activeSessionId === id) {
+      document.getElementById('topSession').textContent = newTitle;
+      document.getElementById('txHdrTitle').textContent = newTitle;
+    }
+  });
+}
+
+function renameActiveSession() {
+  if (activeSessionId) renameSession(activeSessionId);
+}
+
+// ═══════════════════════════════════════
+// COURSE / SESSION DELETE
+// ═══════════════════════════════════════
+function deleteCourse(id) {
+  const c = db.courses.find(c => c.id === id);
+  if (!c) return;
+  if (!confirm('"' + c.name + '" 과목을 삭제하시겠습니까?\n세션 ' + c.sessions.length + '개와 모든 AI 결과가 함께 삭제됩니다.')) return;
+  const input = prompt('확인을 위해 과목명을 정확히 입력하세요:\n' + c.name);
+  if (input === null) return;
+  if (input !== c.name) { alert('과목명이 일치하지 않습니다.'); return; }
+  stopRec();
+  db.courses = db.courses.filter(c => c.id !== id);
+  if (activeCourseId === id) {
+    activeCourseId = db.courses.length ? db.courses[0].id : null;
+    activeSessionId = null;
+  }
+  save(); renderAll();
+  if (activeCourseId) selectCourse(activeCourseId);
+}
+
+function deleteSession(id) {
+  const c = activeCourse(); if (!c) return;
+  const s = c.sessions.find(s => s.id === id);
+  if (!s) return;
+  if (!confirm('"' + s.title + '" 세션을 삭제하시겠습니까?\n트랜스크립트, 인사이트, Q&A가 모두 삭제됩니다.')) return;
+  if (isRecording && activeSessionId === id) stopRec();
+  c.sessions = c.sessions.filter(s => s.id !== id);
+  if (activeSessionId === id) {
+    activeSessionId = c.sessions.length ? c.sessions[c.sessions.length - 1].id : null;
+  }
+  save(); renderSessions(); renderTranscript(); renderRight();
+  if (activeSessionId) selectSession(activeSessionId);
+}
+
+
+// ═══════════════════════════════════════
+// FILE MANAGEMENT (자료관리 탭)
+// ═══════════════════════════════════════
+function getFileIcon(name) {
+  const ext = (name||'').split('.').pop().toLowerCase();
+  if (ext==='pdf') return '📄';
+  if (['jpg','jpeg','png','gif','webp'].includes(ext)) return '🖼';
+  if (['ppt','pptx'].includes(ext)) return '📊';
+  if (['doc','docx'].includes(ext)) return '📃';
+  if (['mp3','m4a','wav','ogg','webm'].includes(ext)) return '🎵';
+  return '📝';
+}
+function getFileTypeCls(name) {
+  const ext = (name||'').split('.').pop().toLowerCase();
+  if (ext==='pdf') return 'ft-pdf';
+  if (['jpg','jpeg','png','gif','webp'].includes(ext)) return 'ft-img';
+  if (['ppt','pptx'].includes(ext)) return 'ft-ppt';
+  return 'ft-txt';
+}
+
+function renderKBDashboard() {
+  const c = activeCourse();
+  const el = document.getElementById('kbDashboard');
+  if (!el) return;
+  if (!c) {
+    el.innerHTML = '<div class="empty"><div class="ei">🗂</div><div class="et">과목을 선택하면 자료관리 화면이 표시됩니다</div></div>';
+    return;
+  }
+  if (!c.courseFiles) c.courseFiles = [];
+  if (!c.kbSources)   c.kbSources  = [];
+
+  let html = '';
+
+  // ── 1. 과목 공통 자료 ──
+  html += '<div style="margin-bottom:16px">'
+       +  '<div class="kb-section-hdr">📚 과목 공통 자료 <span>'+(c.courseFiles.length+c.kbSources.length)+'개 · AI 답변에 항상 포함</span></div>'
+       +  '<div class="file-drop-zone" id="courseDropZone"'
+       +  ' onclick="document.getElementById(\'courseFileInput\').click()"'
+       +  ' ondragover="event.preventDefault();this.classList.add(\'drag-over\')"'
+       +  ' ondragleave="this.classList.remove(\'drag-over\')"'
+       +  ' ondrop="handleFileDrop(event)">'
+       +  '<div class="file-drop-zone-text">📎 클릭 또는 드래그 &mdash; 강의계획서·교재·학기초 자료 (PDF·PPT·TXT·JPG)</div></div>'
+       +  c.courseFiles.map(function(f){ return renderFileCard(f,'course',''); }).join('')
+       +  c.kbSources.map(function(src){ return '<div class="fcard"><div class="fcard-hdr"><div class="fcard-icon">✏️</div><div class="fcard-name">'+src.name+'</div><div class="fcard-type ft-txt">텍스트</div><div class="fcard-actions"><button class="fcard-btn del" onclick="delKBSrc(\''+src.id+'\');renderKBDashboard()">✕</button></div></div></div>'; }).join('')
+       +  '</div>';
+
+  // ── 2. 텍스트 메모 ──
+  html += '<div style="margin-bottom:16px">'
+       +  '<div class="kb-section-hdr">✏️ 텍스트 메모 추가</div>'
+       +  '<textarea class="kb-paste-input" id="kbPaste" placeholder="원우 공유 내용, 핵심 정리, 강의 노트…" rows="2" style="width:100%;background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:7px 9px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none;resize:none;margin-bottom:5px"></textarea>'
+       +  '<div class="kb-add-row"><input style="flex:1;background:var(--s3);border:1px solid var(--b);border-radius:5px;padding:5px 8px;font-size:11px;font-family:var(--sans);color:var(--tx);outline:none" id="kbSrcName" placeholder="소스 이름 (예: 3강 요약)"><button class="kb-add-btn" onclick="addKBText();renderKBDashboard()">추가</button></div>'
+       +  '</div>';
+
+  // ── 3. 강의별 자료 ──
+  html += '<div><div class="kb-section-hdr" style="margin-bottom:8px">📅 강의별 자료</div>';
+  if (!c.sessions.length) {
+    html += '<div style="font-size:11px;color:var(--tx3);padding:4px 0">세션 없음</div>';
+  } else {
+    var sorted = [...c.sessions].sort(function(a,b){ return a.date>b.date?1:-1; });
+    sorted.forEach(function(s) {
+      if (!s.sessionFiles) s.sessionFiles = [];
+      var hasT = s.segments && s.segments.length > 0;
+      var hasF = s.sessionFiles.length > 0;
+      var dotColor = (hasT||hasF) ? 'var(--ins)' : 'var(--tx3)';
+      var isAct = s.id === activeSessionId;
+      html += '<div class="session-file-section" style="'+(isAct?'border-color:var(--cur)':'')+'">';
+      html += '<div class="session-file-hdr" onclick="selectSession(\''+s.id+'\');switchRTab(\'ins\')">';
+      html += '<div class="sstat-dot" style="background:'+dotColor+'"></div>';
+      html += '<div style="font-size:11px;font-weight:500;color:var(--tx);flex:1">'+s.title+'</div>';
+      html += '<div style="font-family:var(--mono);font-size:9px;color:var(--tx3)">'+(s.date||'')+'</div>';
+      html += '<div style="font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;background:'+(s.type==='live'?'rgba(239,68,68,.15)':'var(--s4)')+';color:'+(s.type==='live'?'var(--red)':'var(--tx3)')+'">'+( s.type==='live'?'녹음':'텍스트')+'</div>';
+      html += '</div><div class="session-file-body">';
+      if (hasT) {
+        html += '<div style="display:flex;align-items:center;gap:6px;padding:3px 0"><span style="font-size:11px">📝</span><span style="font-size:11px;color:var(--tx2);flex:1">트랜스크립트 · ' + fmtSessionInfo(s) + '</span><button class="fcard-btn" onclick="activeSessionId=\''+s.id+'\';downloadTxt()">↓ TXT</button></div>';
+      } else {
+        html += '<div style="font-size:10px;color:var(--tx3)">📝 트랜스크립트 없음</div>';
+      }
+      html += s.sessionFiles.map(function(f){ return renderFileCard(f,'session',s.id); }).join('');
+      html += '<div style="margin-top:4px"><button class="fcard-btn" style="color:var(--c5);border-color:rgba(6,182,212,.3)" onclick="window._uploadSid=\''+s.id+'\';document.getElementById(\'sessionFileInput\').click()">+ 파일 추가</button></div>';
+      html += '</div></div>';
+    });
+  }
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+function renderFileCard(f, scope, sessionId) {
+  var icon = getFileIcon(f.name);
+  var cls  = getFileTypeCls(f.name);
+  var ext  = (f.name||'').split('.').pop().toUpperCase().slice(0,5);
+  return '<div class="fcard"><div class="fcard-hdr">'
+       + '<div class="fcard-icon">'+icon+'</div>'
+       + '<div class="fcard-name" title="'+f.name+'">'+f.name+'</div>'
+       + '<div class="fcard-type '+cls+'">'+ext+'</div>'
+       + '<div class="fcard-actions">'
+       + (f.extractedText ? '<button class="fcard-btn" onclick="viewFileText(\''+f.id+'\',\''+scope+'\',\''+sessionId+'\')">👁</button>' : '')
+       + '<button class="fcard-btn del" onclick="delFile(\''+f.id+'\',\''+scope+'\',\''+sessionId+'\')">✕</button>'
+       + '</div></div></div>';
+}
+
+function uploadCourseFiles(e) {
+  var c = activeCourse(); if (!c) return;
+  if (!c.courseFiles) c.courseFiles = [];
+  Array.from(e.target.files).forEach(function(file) {
+    processFileUpload(file, function(f) { c.courseFiles.push(f); save(); renderKBDashboard(); });
+  });
+  e.target.value = '';
+}
+
+function uploadSessionFiles(e) {
+  var c = activeCourse(); if (!c) return;
+  var sid = window._uploadSid || activeSessionId;
+  var s = c.sessions.find(function(s){ return s.id===sid; });
+  if (!s) { e.target.value = ''; window._uploadSid = null; return; }
+  if (!s.sessionFiles) s.sessionFiles = [];
+  var files = Array.from(e.target.files);
+  var done = 0;
+  files.forEach(function(file) {
+    processFileUpload(file, function(f) {
+      s.sessionFiles.push(f);
+      done++;
+      save();
+      if (done === files.length) renderKBDashboard(); // re-render once all done
+    });
+  });
+  e.target.value = '';
+  window._uploadSid = null;
+}
+
+function handleFileDrop(e) {
+  e.preventDefault();
+  var el = document.getElementById('courseDropZone');
+  if (el) el.classList.remove('drag-over');
+  var c = activeCourse(); if (!c) return;
+  if (!c.courseFiles) c.courseFiles = [];
+  Array.from(e.dataTransfer.files).forEach(function(file) {
+    processFileUpload(file, function(f) { c.courseFiles.push(f); save(); renderKBDashboard(); });
+  });
+}
+
+function processFileUpload(file, onDone) {
+  var id = uid();
+  var fobj = { id: id, name: file.name, type: file.type, size: file.size, ts: nowStr(), extractedText: null };
+  var ext = file.name.split('.').pop().toLowerCase();
+
+  if (['jpg','jpeg','png','gif','webp'].includes(ext)) {
+    // Image: store as base64 for Claude vision
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var b64 = ev.target.result.split(',')[1];
+      fobj.base64Data = b64;
+      fobj.mimeType = file.type || 'image/jpeg';
+      fobj.extractedText = '[이미지 파일 — Claude가 직접 분석]';
+      onDone(fobj);
+    };
+    reader.readAsDataURL(file);
+
+  } else if (ext === 'pdf') {
+    // PDF: store as base64 — Claude API reads it natively (including scanned PDFs)
+    showTranscribeBanner('📄 PDF 업로드 중: ' + file.name, 'progress', 50);
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var binary = '';
+      var bytes = new Uint8Array(ev.target.result);
+      for (var i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      fobj.base64Data = btoa(binary);
+      fobj.mimeType = 'application/pdf';
+      fobj.extractedText = '[PDF 파일 — Claude가 직접 분석 (' + Math.round(file.size/1024) + 'KB)]';
+      hidTranscribeBanner();
+      onDone(fobj);
+    };
+    reader.readAsArrayBuffer(file);
+
+  } else {
+    // Text-based files (TXT, MD etc.)
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var raw = ev.target.result || '';
+      var cleaned = raw.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ' ').trim();
+      fobj.extractedText = cleaned.slice(0, 200000);
+      onDone(fobj);
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+}
+
+function delFile(fileId, scope, sessionId) {
+  var c = activeCourse(); if (!c) return;
+  if (scope === 'course') {
+    c.courseFiles = (c.courseFiles||[]).filter(function(f){ return f.id!==fileId; });
+  } else {
+    var s = c.sessions.find(function(s){ return s.id===sessionId; });
+    if (s) s.sessionFiles = (s.sessionFiles||[]).filter(function(f){ return f.id!==fileId; });
+  }
+  save(); renderKBDashboard();
+}
+
+function viewFileText(fileId, scope, sessionId) {
+  var c = activeCourse(); if (!c) return;
+  var f;
+  if (scope === 'course') {
+    f = (c.courseFiles||[]).find(function(f){ return f.id===fileId; });
+  } else {
+    var s = c.sessions.find(function(s){ return s.id===sessionId; });
+    f = (s ? s.sessionFiles||[] : []).find(function(f){ return f.id===fileId; });
+  }
+  if (!f) return;
+  var w = window.open('','_blank','width=700,height=500,scrollbars=yes');
+  if (w) w.document.write('<pre style="font-family:monospace;font-size:12px;padding:16px;white-space:pre-wrap">'+(f.extractedText||'내용 없음').replace(/</g,'&lt;')+'</pre>');
+}
+
+function downloadTxt() {
+  var s = activeSession(); if (!s) return;
+  var text = s.segments.map(function(sg){ return sg.text; }).join('\n\n');
+  var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (s.title||'transcript') + '.txt';
+  a.click();
+}
+
+function buildKBContext(course) {
+  // Returns { text: string, files: [{base64Data, mimeType, name}] }
+  if (!course) return { text: '', files: [] };
+  var textParts = [];
+  var fileParts = [];
+
+  if (course.kbSources && course.kbSources.length) {
+    textParts.push('## 과목 Knowledge Base\n' + course.kbSources.map(function(s){ return '['+s.name+']\n'+s.content; }).join('\n\n'));
+  }
+  if (course.courseFiles && course.courseFiles.length) {
+    course.courseFiles.forEach(function(f) {
+      if (f.base64Data) {
+        fileParts.push({ base64Data: f.base64Data, mimeType: f.mimeType, name: f.name });
+      } else if (f.extractedText) {
+        textParts.push('[파일: '+f.name+']\n'+f.extractedText.slice(0,30000));
+      }
+    });
+  }
+  var s = activeSession();
+  if (s && s.sessionFiles && s.sessionFiles.length) {
+    s.sessionFiles.forEach(function(f) {
+      if (f.base64Data) {
+        fileParts.push({ base64Data: f.base64Data, mimeType: f.mimeType, name: f.name });
+      } else if (f.extractedText) {
+        textParts.push('[강의자료: '+f.name+']\n'+f.extractedText.slice(0,20000));
+      }
+    });
+  }
+  return {
+    text: textParts.length ? '\n\n' + textParts.join('\n\n') : '',
+    files: fileParts
+  };
+}
+
+function renderKB() { renderKBDashboard(); }
+
+
+// ═══════════════════════════════════════
+// ONBOARDING
+// ═══════════════════════════════════════
+function onboardChooseDrive() {
+  localStorage.setItem('onboarding_done', '1');
+  closeModal('onboardingModal');
+  handleGoogleLogin();
+}
+function onboardChooseLocal() {
+  localStorage.setItem('onboarding_done', '1');
+  closeModal('onboardingModal');
+  showTranscribeBanner('💾 로컬 저장 모드. 주기적으로 📤 백업을 권장합니다.', 'done');
+}
+
+
+// ═══════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════
+function switchRTab(tab) {
+  ['ins','qa','exam','hw','kb'].forEach(t => {
+    document.getElementById('pane-' + t).className = 'rpane' + (t === tab ? ' show' : '');
+    const cls = {ins:'ai',qa:'aq',exam:'ae',hw:'ah',kb:'ak'}[t];
+    document.getElementById('rt-' + t).className = 'rtab' + (t === tab ? ' ' + cls : '');
+  });
+  if (tab === 'kb') renderKBDashboard();
+}
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); }));
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+migrateLegacySettings();
+load();
+buildCPick(COLORS[0]);
+renderAll();
+if (db.courses.length && !activeCourseId) selectCourse(db.courses[0].id);
+applySettings();
+// 첫 실행 온보딩
+if (!localStorage.getItem('onboarding_done')) {
+  setTimeout(() => openModal('onboardingModal'), 500);
+}
+// Drive 자동 재연결
+setTimeout(() => {
+  if (typeof google !== 'undefined') tryAutoReconnectDrive();
+}, 1000);
+// 오프라인 감지 이벤트
+window.addEventListener('online',  () => showTranscribeBanner('✅ 인터넷 연결됨', 'done'));
+window.addEventListener('offline', () => showTranscribeBanner('⚠ 오프라인 — AI 기능이 제한됩니다. 녹음은 계속 가능합니다.', 'error'));
+</script>
+
+<!-- ══════════════════════════════════════════════
+     SETTINGS MODAL
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal settings-modal">
+    <div class="mhdr">
+      <div class="mtitle">⚙ 설정</div>
+      <button class="mclose" onclick="closeModal('settingsModal')">×</button>
+    </div>
+
+    <!-- TABS -->
+    <div class="settings-tabs">
+      <button class="stab on" id="stab-api"  onclick="switchStab('api')">🔑 API</button>
+      <button class="stab"    id="stab-rec"  onclick="switchStab('rec')">🎙 녹음</button>
+      <button class="stab"    id="stab-ai"   onclick="switchStab('ai')">🤖 AI</button>
+      <button class="stab"    id="stab-user" onclick="switchStab('user')">👤 사용자</button>
+      <button class="stab"    id="stab-ui"   onclick="switchStab('ui')">📱 UI</button>
+    </div>
+
+    <!-- API TAB -->
+    <div class="spane show" id="spane-api">
+      <div class="sgroup">
+        <div class="sgroup-hdr">Anthropic Claude</div>
+        <div class="srow">
+          <div class="srow-label">연결 방식<div class="srow-sub">Vercel 서버 프록시(/api/proxy) 경유 — ANTHROPIC_KEY는 Vercel 환경변수에 저장됨</div></div>
+          <span class="sbadge" style="background:rgba(16,185,129,.12);color:var(--ins)">✓ 프록시 사용 중</span>
+        </div>
+      </div>
+      <div class="sgroup">
+        <div class="sgroup-hdr">Google Gemini (녹음 전체 변환)</div>
+        <div class="srow">
+          <div class="srow-label">API 키</div>
+          <input class="sinput wide" id="s-geminiKey" type="password" placeholder="AIza...">
+        </div>
+        <div class="srow">
+          <div class="srow-label">모델<div class="srow-sub">aistudio.google.com/models 에서 확인</div></div>
+          <input class="sinput" id="s-geminiModel" placeholder="gemini-2.5-flash">
+        </div>
+      </div>
+      <div class="sinfo">💡 API 키는 브라우저 localStorage에만 저장됩니다. 서버로 전송되지 않습니다.</div>
+    </div>
+
+    <!-- RECORDING TAB -->
+    <div class="spane" id="spane-rec">
+      <div class="sgroup">
+        <div class="sgroup-hdr">음성 인식</div>
+        <div class="srow">
+          <div class="srow-label">녹음 언어<div class="srow-sub">STT 인식 언어</div></div>
+          <select class="sselect" id="s-recLang">
+            <option value="ko-KR">한국어 (ko-KR)</option>
+            <option value="en-US">English (en-US)</option>
+            <option value="ja-JP">日本語 (ja-JP)</option>
+            <option value="zh-CN">中文 (zh-CN)</option>
+          </select>
+        </div>
+        <div class="srow">
+          <div class="srow-label">세그먼트 최소 길이<div class="srow-sub">이 글자 수 미만은 저장 안 함 (현재: 2자)</div></div>
+          <input class="sinput sm" id="s-minSegLen" type="number" min="1" max="20" value="2">
+        </div>
+      </div>
+      <div class="sgroup">
+        <div class="sgroup-hdr">Gemini 전체 변환</div>
+        <div class="srow">
+          <div class="srow-label">자동 변환<div class="srow-sub">녹음 종료 시 Gemini로 자동 전체 변환</div></div>
+          <label class="stoggle"><input type="checkbox" id="s-autoTranscribe"><span class="stoggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI TAB -->
+    <div class="spane" id="spane-ai">
+      <div class="sgroup">
+        <div class="sgroup-hdr">기본 모델</div>
+        <div class="srow">
+          <div class="srow-label">Claude 모델</div>
+          <select class="sselect" id="s-defaultModel">
+            <option value="haiku">Haiku 4.5 (가장 빠름·저비용)</option>
+            <option value="sonnet" selected>Sonnet 4.6 (균형, 권장)</option>
+            <option value="opus">Opus 4.6 (최고품질, 느림)</option>
+          </select>
+        </div>
+      </div>
+      <div class="sgroup">
+        <div class="sgroup-hdr">응답 품질</div>
+        <div class="srow">
+          <div class="srow-label">최대 토큰<div class="srow-sub">AI 응답 최대 길이 (현재: 1500)</div></div>
+          <input class="sinput sm" id="s-maxTokens" type="number" min="500" max="4000" step="100">
+        </div>
+        <div class="srow">
+          <div class="srow-label">인사이트 컨텍스트<div class="srow-sub">트랜스크립트 최대 전달 글자 수</div></div>
+          <input class="sinput sm" id="s-ctxInsight" type="number" min="1000" max="10000" step="500">
+        </div>
+        <div class="srow">
+          <div class="srow-label">Q&A 컨텍스트</div>
+          <input class="sinput sm" id="s-ctxQa" type="number" min="1000" max="10000" step="500">
+        </div>
+        <div class="srow">
+          <div class="srow-label">시험/과제 컨텍스트</div>
+          <input class="sinput sm" id="s-ctxExam" type="number" min="1000" max="10000" step="500">
+        </div>
+      </div>
+      <div class="sgroup">
+        <div class="sgroup-hdr">자동 인사이트</div>
+        <div class="srow">
+          <div class="srow-label">자동 인사이트<div class="srow-sub">녹음 중 일정 시간마다 자동 요청</div></div>
+          <label class="stoggle"><input type="checkbox" id="s-autoInsight"><span class="stoggle-slider"></span></label>
+        </div>
+        <div class="srow">
+          <div class="srow-label">자동 인사이트 간격 (분)</div>
+          <input class="sinput sm" id="s-autoInsightMin" type="number" min="1" max="30" value="10">
+        </div>
+      </div>
+    </div>
+
+    <!-- USER TAB -->
+    <div class="spane" id="spane-user">
+      <div class="sgroup">
+        <div class="sgroup-hdr">프로필</div>
+        <div class="srow">
+          <div class="srow-label">이름<div class="srow-sub">Drive 버튼 등에 표시</div></div>
+          <input class="sinput" id="s-userName" placeholder="이름">
+        </div>
+        <div class="srow">
+          <div class="srow-label">소속</div>
+          <input class="sinput" id="s-userOrg" placeholder="예: 고려대 KMBA">
+        </div>
+        <div class="srow">
+          <div class="srow-label">AI 응답 스타일<div class="srow-sub">시스템 프롬프트에 반영</div></div>
+          <select class="sselect" id="s-aiStyle">
+            <option value="concise">간결 (2~3문장)</option>
+            <option value="normal">보통 (3~5문장)</option>
+            <option value="detailed">상세 (제한 없음)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- UI TAB -->
+    <div class="spane" id="spane-ui">
+      <div class="sgroup">
+        <div class="sgroup-hdr">Drive 동기화</div>
+        <div class="srow">
+          <div class="srow-label">자동 저장 딜레이 (초)<div class="srow-sub">저장 후 Drive 업로드까지 대기 시간</div></div>
+          <input class="sinput sm" id="s-driveSaveDelay" type="number" min="1" max="30" value="3">
+        </div>
+      </div>
+      <div class="sgroup">
+        <div class="sgroup-hdr">데이터 관리</div>
+        <div class="srow">
+          <div class="srow-label">전체 초기화<div class="srow-sub">모든 과목·세션·AI 결과 삭제 (되돌릴 수 없음)</div></div>
+          <button class="btn-cancel" style="font-size:10px;color:var(--red);border-color:rgba(239,68,68,.3)" onclick="resetAllData()">⚠ 초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mfooter">
+      <button class="btn-cancel" onclick="closeModal('settingsModal')">취소</button>
+      <button class="btn-ok" onclick="saveSettings()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE NAME MODAL -->
+<div class="modal-overlay" id="liveNameModal">
+  <div class="modal" style="width:360px">
+    <div class="mhdr">
+      <div class="mtitle" id="liveNameTitle">세션 이름 지정</div>
+      <button class="mclose" onclick="closeModal('liveNameModal')">×</button>
+    </div>
+    <div class="mbody">
+      <div class="frow">
+        <div class="flabel">세션명</div>
+        <input class="finput" id="liveNameInput" placeholder="예: KMB 560 재무회계 1차 강의"
+          onkeydown="if(event.key==='Enter')confirmLiveName()">
+      </div>
+    </div>
+    <div class="mfooter">
+      <button class="btn-cancel" onclick="closeModal('liveNameModal')">취소</button>
+      <button class="btn-ok" onclick="confirmLiveName()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ONBOARDING MODAL -->
+<div class="modal-overlay" id="onboardingModal">
+  <div class="modal" style="width:420px">
+    <div class="mhdr">
+      <div class="mtitle">👋 MBA·HUB에 오신 것을 환영합니다</div>
+    </div>
+    <div class="mbody" style="gap:14px">
+      <div style="font-size:12px;color:var(--tx2);line-height:1.7">
+        강의 녹음, AI 분석, 자료관리를 한 곳에서.<br>
+        데이터 저장 방식을 선택해주세요.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:var(--s3);border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:12px 14px;cursor:pointer" onclick="onboardChooseDrive()">
+          <div style="font-size:12px;font-weight:600;color:var(--ins);margin-bottom:4px">☁ Google Drive 동기화 (권장)</div>
+          <div style="font-size:11px;color:var(--tx3);line-height:1.6">여러 기기에서 접속 가능 · 자동 백업 · 브라우저 캐시 삭제해도 안전</div>
+        </div>
+        <div style="background:var(--s3);border:1px solid var(--b2);border-radius:8px;padding:12px 14px;cursor:pointer" onclick="onboardChooseLocal()">
+          <div style="font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:4px">💾 로컬 저장만 사용</div>
+          <div style="font-size:11px;color:var(--tx3);line-height:1.6">인터넷 없이 사용 가능 · 이 브라우저에만 저장 · 주기적 백업 권장</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--tx3)">나중에 상단 ☁ Drive 버튼으로 언제든 변경 가능합니다.</div>
+    </div>
+  </div>
+</div>
+
+</body>
